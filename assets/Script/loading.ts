@@ -1,7 +1,12 @@
 import { gameGlobal } from "./UserModel";
+import EventCenter, { EventType } from "./EventCenter";
+import debugInfo from "./debugInfo";
 
 const { ccclass, property } = cc._decorator;
 
+/**
+ * 在进入登录阶段之前，进行版本检测，更新检测等功能
+ */
 @ccclass
 export default class loading extends cc.Component {
 
@@ -10,12 +15,15 @@ export default class loading extends cc.Component {
     // onLoad () {}
 
     start() {
-        this.getUrlAccount();
+        this._getUrlAccount();
+        // cc.director.loadScene("login");
     }
 
     // update (dt) {}
-
-    private getUrlAccount() {
+    /**
+     * 为了便于测试，预先读取了本地浏览器上的 account 数据，修改 account 数据可以做到在同个浏览器上登录多个账号的功能 例如在url后接上：  ?account=MyAccountName_1
+     */
+    private _getUrlAccount() {
         let name, value;
         let str = window.location.href; //取得整个地址栏
         let num = str.indexOf("?")
@@ -32,5 +40,6 @@ export default class loading extends cc.Component {
                 }
             }
         }
+        debugInfo.instance.addInfo("获得的自定义账号名为：", value);
     }
 }

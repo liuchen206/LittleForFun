@@ -88,6 +88,9 @@
       },
       {
         "__id__": 14
+      },
+      {
+        "__id__": 15
       }
     ],
     "_prefab": null,
@@ -177,7 +180,7 @@
       "array": [
         0,
         0,
-        366.32874580081756,
+        433.8787272960038,
         0,
         0,
         0,
@@ -503,7 +506,7 @@
         1,
         1,
         1,
-        0
+        1
       ]
     },
     "_eulerAngles": {
@@ -678,5 +681,15 @@
     "_originalWidth": 0,
     "_originalHeight": 0,
     "_id": "f71k5EJEJDYZgTNTbg2qZR"
+  },
+  {
+    "__type__": "09fb3lreQtJlbSTME3p5/oK",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 2
+    },
+    "_enabled": true,
+    "_id": "7efD6mO39GToM8PddT6SGR"
   }
 ]
