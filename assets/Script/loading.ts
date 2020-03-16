@@ -1,5 +1,6 @@
 import { gameGlobal } from "./core_system/UserModel";
 import debugInfo from "./core_system/debugInfo";
+import { waitForTime } from "../tools/Tools";
 
 const { ccclass, property } = cc._decorator;
 
@@ -8,7 +9,11 @@ const { ccclass, property } = cc._decorator;
  */
 @ccclass
 export default class loading extends cc.Component {
-
+    @property({
+        type: cc.Label,
+        tooltip: "载入时的提示文字"
+    })
+    tipLabel: cc.Label = null;
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
@@ -18,7 +23,9 @@ export default class loading extends cc.Component {
         // cc.director.loadScene("login");
     }
 
-    // update (dt) {}
+    update(dt) {
+
+    }
     /**
      * 为了便于测试，预先读取了本地浏览器上的 account 数据，修改 account 数据可以做到在同个浏览器上登录多个账号的功能 例如在url后接上：  ?account=MyAccountName_1
      */
