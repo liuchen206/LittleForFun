@@ -1,6 +1,5 @@
-import { gameGlobal } from "./UserModel";
-import EventCenter, { EventType } from "./EventCenter";
-import debugInfo from "./debugInfo";
+import { gameGlobal } from "./core_system/UserModel";
+import debugInfo from "./core_system/debugInfo";
 
 const { ccclass, property } = cc._decorator;
 

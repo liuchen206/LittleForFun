@@ -1,4 +1,4 @@
-import { VM } from "../tools/modelView/ViewModel";
+import { VM } from "../../tools/modelView/ViewModel";
 
 export class GlobalData {
     accountSet: string = "";
