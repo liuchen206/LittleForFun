@@ -19,6 +19,9 @@ export class UnitIdCreator {
  */
 export let localStorageMap = {
     testData: "testData",
+    wx_account: "wx_account",
+    wx_sign: "wx_sign",
+    yk_account:"yk_account"
 };
 /**
  * 
@@ -48,6 +51,14 @@ export function localStorageGet(key, type) {
             return [];
         }
     }
+    if (type == "string") {
+        let result = cc.sys.localStorage.getItem(key);
+        if (result) {
+            return result;
+        } else {
+            return 0;
+        }
+    }
 }
 /**
  * 按键值对的方式存储数据
@@ -61,6 +72,9 @@ export function localStorageSet(key, type, value) {
     }
     if (type == "array") {
         cc.sys.localStorage.setItem(key, JSON.stringify(value));
+    }
+    if (type == "string") {
+        cc.sys.localStorage.setItem(key, value + "");
     }
 }
 /**
@@ -101,7 +115,7 @@ export function getNormalPoint(p: cc.Vec2, a: cc.Vec2, b: cc.Vec2) {
     let ab = b.subtract(a);
     ab.normalizeSelf();
     let kk = ap.dot(ab);
-    ab = ab.multiply(new cc.Vec2(kk,kk));
+    ab = ab.multiply(new cc.Vec2(kk, kk));
     return a.add(ab);
 }
 /**

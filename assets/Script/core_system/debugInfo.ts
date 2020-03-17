@@ -8,7 +8,7 @@ export default class debugInfo extends cc.Component {
 
     @property({
         tooltip: '需要展示的label的预制体',
-        type:cc.Prefab,
+        type: cc.Prefab,
     })
     label: cc.Prefab = null;
 
@@ -30,14 +30,17 @@ export default class debugInfo extends cc.Component {
     // update (dt) {}
 
     /**
-     * 
+     * 向界面最上层添加一条label信息。
      * @param text 展示字符串
      * @param otherString 想不过要多加几个字符串
      */
     addInfo(text: string, ...otherString: string[]) {
         if (this.isUsed == false) return;
-        if (this.node.childrenCount >= 10) {
-            this.node.removeAllChildren();
+        if (this.node.childrenCount >= 11) {
+            for (let i = 0; i < this.node.childrenCount; i++) {
+                this.node.children[i].removeFromParent();
+            }
+            // this.node.removeAllChildren();
         }
         let n = cc.instantiate(this.label);
         n.getComponent(cc.Label).string = text + " " + otherString.join(" ");

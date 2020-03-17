@@ -81,13 +81,13 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 11
-      },
-      {
         "__id__": 12
       },
       {
         "__id__": 13
+      },
+      {
+        "__id__": 14
       }
     ],
     "_prefab": null,
@@ -177,7 +177,7 @@
       "array": [
         0,
         0,
-        433.8787272960038,
+        474.5819212738724,
         0,
         0,
         0,
@@ -374,7 +374,7 @@
         "__id__": 9
       },
       {
-        "__id__": 10
+        "__id__": 11
       }
     ],
     "_prefab": null,
@@ -439,7 +439,11 @@
     "_grayMaterial": null,
     "duration": 0.1,
     "zoomScale": 1.2,
-    "clickEvents": [],
+    "clickEvents": [
+      {
+        "__id__": 10
+      }
+    ],
     "_N$interactable": true,
     "_N$enableAutoGrayEffect": false,
     "_N$transition": 3,
@@ -508,6 +512,16 @@
       "__id__": 8
     },
     "_id": "5bcIjQLL9OGoXhNNbslLEw"
+  },
+  {
+    "__type__": "cc.ClickEvent",
+    "target": {
+      "__id__": 2
+    },
+    "component": "",
+    "_componentId": "09fb3lreQtJlbSTME3p5/oK",
+    "handler": "onYKClicked",
+    "customEventData": ""
   },
   {
     "__type__": "cc.Sprite",

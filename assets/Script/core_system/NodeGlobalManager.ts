@@ -9,8 +9,10 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class NodeGlobalManager extends cc.Component {
     // LIFE-CYCLE CALLBACKS:
+    static instance: NodeGlobalManager = null;
 
     onLoad() {
+        NodeGlobalManager.instance = this;
         cc.game.addPersistRootNode(this.node);
     }
 
