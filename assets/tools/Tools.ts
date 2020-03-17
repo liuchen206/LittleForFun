@@ -56,7 +56,7 @@ export function localStorageGet(key, type) {
         if (result) {
             return result;
         } else {
-            return 0;
+            return "";
         }
     }
 }

@@ -23,14 +23,13 @@ export default class login extends cc.Component {
 
         Net.instance.addHandler('push_need_create_role', function () {
             console.log("onLoad:push_need_create_role");
-            // cc.director.loadScene("createrole");
-            debugInfo.instance.addInfo("成功进入大厅，但场景未创建2");
+            cc.director.loadScene("creatorRole");
         });
 
         // 微信自动登录
         var account = localStorageGet(localStorageMap.wx_account, "string");
         var sign = localStorageGet(localStorageMap.wx_sign, "string");
-        if (account != null && sign != null) {
+        if (account != "" && sign != "") {
             var ret = {
                 errcode: 0,
                 account: account,

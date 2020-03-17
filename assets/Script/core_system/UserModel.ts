@@ -5,11 +5,11 @@ import debugInfo from "./debugInfo";
 import { localStorageGet, localStorageMap, localStorageSet } from "../../tools/Tools";
 
 export class UserData {
-    accountSet: string = null;
+    accountSet: string = ""; // 测试用的本地url，加的账户参数
     sign: string = "";
-    account: null;
-    userId: null;
-    userName: null;
+    account: string = "";
+    userId: string = "";
+    userName: string = "";
     lv: number = 0;
     exp: number = 0;
     coins: number = 0;
@@ -27,20 +27,21 @@ export class UserData {
      */
     guestAuth() {
         var account = this.accountSet;
-        if (account == null) {
+        if (account == "") {
             account = localStorageGet(localStorageMap.yk_account, "string");
         }
 
-        if (account == null) {
+        if (account == "") {
             localStorageSet(localStorageMap.yk_account, "string", Date.now());
         }
+        debugInfo.instance.addInfo("游客账号信息 account ", account)
 
         Http.instance.sendRequest("/guest", { account: account }, (ret) => {
             if (ret.errcode !== 0) {
                 console.log(ret.errmsg);
             }
             else {
-                this.accountSet = ret.account;
+                this.account = ret.account;
                 this.sign = ret.sign;
                 Http.instance.URL = "http://" + this.SI.hall;
                 this.login();
@@ -57,6 +58,8 @@ export class UserData {
             console.log(ret.errmsg);
         }
         else {
+            debugInfo.instance.addInfo("渠道平台账号信息 account+sign ", ret.account, ret.sign)
+
             self.account = ret.account;
             self.sign = ret.sign;
             Http.instance.URL = "http://" + this.SI.hall;
@@ -75,9 +78,7 @@ export class UserData {
             } else {
                 if (!ret.userid) {
                     //jump to register user info.
-                    // cc.director.loadScene("createrole");
-                    debugInfo.instance.addInfo("需要創建角色，但场景未创建");
-
+                    cc.director.loadScene("creatorRole");
                 } else {
                     console.log(ret);
                     self.account = ret.account;
@@ -90,19 +91,41 @@ export class UserData {
                     self.roomData = ret.roomid;
                     self.sex = ret.sex;
                     self.ip = ret.ip;
-                    // cc.director.loadScene("hall");
-                    debugInfo.instance.addInfo("成功进入大厅，但场景未创建");
+                    cc.director.loadScene("hall");
                 }
             }
         };
-        PopUI.instance.show("正在登录游戏 " + this.account +"  "+ this.sign);
+        PopUI.instance.show("正在登录游戏 account + sign = " + this.account + "  " + this.sign);
         Http.instance.sendRequest("/login", { account: this.account, sign: this.sign }, onLogin);
+    }
+
+    /**
+     * 创建一个新的账户
+     * @param name 账户名字
+     */
+    create(name) {
+        var self = this;
+        var onCreate = function (ret) {
+            if (ret.errcode !== 0) {
+                console.log(ret.errmsg);
+            }
+            else {
+                self.login();
+            }
+        };
+
+        var data = {
+            account: this.account,
+            sign: this.sign,
+            name: name
+        };
+        Http.instance.sendRequest("/create_user", data, onCreate);
     }
 }
 //原始数据
 export let userData: UserData = new UserData();
 //数据模型绑定,定义后不能修改顺序
-VM.add(userData, 'UserData');    //定义全局tag
+VM.add(userData, 'userData');    //定义全局tag
 
 //使用注意事项
 //VM 得到的回调 onValueChanged ，不能强制修改赋值
