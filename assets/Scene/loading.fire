@@ -1023,6 +1023,9 @@
       "__id__": 24
     },
     "_enabled": true,
+    "waitPrefab": {
+      "__uuid__": "6fa05c3a-8f69-418e-8b57-2f14ed737dfc"
+    },
     "_id": "0eRRQr6MpPhJK3yxmOql32"
   },
   {

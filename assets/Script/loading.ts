@@ -24,6 +24,8 @@ export default class loading extends cc.Component {
     // onLoad () {}
 
     start() {
+        // cc.sys.localStorage.clear();
+
         this._getUrlAccount();
 
         this._checkVersion();
@@ -48,7 +50,7 @@ export default class loading extends cc.Component {
      * 为了便于测试，预先读取了本地浏览器上的 account 数据，修改 account 数据可以做到在同个浏览器上登录多个账号的功能 例如在url后接上：  ?account=MyAccountName_1
      */
     private _getUrlAccount() {
-        let name, value;
+        let name, value = "";
         let str = window.location.href; //取得整个地址栏
         let num = str.indexOf("?")
         str = str.substr(num + 1); //取得所有参数   stringlet.substr(start [, length ]
@@ -64,7 +66,7 @@ export default class loading extends cc.Component {
                 }
             }
         }
-        debugInfo.instance.addInfo("获得的自定义账号名为：", value ? "未设置" : value);
+        debugInfo.instance.addInfo("获得的自定义账号名为：", value == "" ? "未设置" : value);
     }
 
     /**
@@ -78,7 +80,9 @@ export default class loading extends cc.Component {
             } else {
                 userData.SI = ret;
 
+
                 debugInfo.instance.addInfo("_checkVersion SI.hall ", userData.SI.hall);
+                debugInfo.instance.addInfo("_checkVersion loading ", Http.instance.URL);
                 debugInfo.instance.addInfo("新版本号为", ret.version, "旧版本号为", Http.instance.VERSION.toString());
                 if (ret.version != Http.instance.VERSION) {
                     //将要进行更新 todo

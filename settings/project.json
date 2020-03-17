@@ -5,6 +5,8 @@
     ]
   ],
   "excluded-modules": [
+    "3D",
+    "3D Primitive",
     "3D Physics/cannon.js",
     "3D Physics/Builtin",
     "3D Particle"
@@ -12,8 +14,8 @@
   "group-list": [
     "default"
   ],
-  "design-resolution-width": 960,
-  "design-resolution-height": 640,
+  "design-resolution-width": 1280,
+  "design-resolution-height": 720,
   "fit-width": false,
   "fit-height": true,
   "use-project-simulator-setting": false,
@@ -35,5 +37,5 @@
       "enable": false
     }
   },
-  "start-scene": "current"
+  "start-scene": "6c934e85-2568-470d-be22-221202884de4"
 }

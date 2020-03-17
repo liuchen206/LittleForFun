@@ -6,7 +6,7 @@ export enum EventType {
     TEST_EVENT = "TEST_EVENT",
 }
 /**
- * EventCenter 作为常驻节点，管理了所以节点的事件注册与派发
+ * EventCenter 作为常驻节点，管理了所以节点的事件注册与派发（这个与网络派发的消息不同，这属于客户端本地传递消息）
  */
 @ccclass
 export default class EventCenter extends cc.Component {

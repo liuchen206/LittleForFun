@@ -25,22 +25,24 @@ export class UserData {
     /**
      * 游客登录权限获取--账号未自动获取
      */
-    guestAuth() {
+    guestAuth(isForceCreateNew?: boolean) {
         var account = this.accountSet;
         if (account == "") {
             account = localStorageGet(localStorageMap.yk_account, "string");
         }
 
         if (account == "") {
+            account = Date.now() + "";
             localStorageSet(localStorageMap.yk_account, "string", Date.now());
         }
+        if (isForceCreateNew == true) account = "randomAccount" + Math.floor(Math.random() * 1000000);
+
         debugInfo.instance.addInfo("游客账号信息 account ", account)
 
         Http.instance.sendRequest("/guest", { account: account }, (ret) => {
             if (ret.errcode !== 0) {
                 console.log(ret.errmsg);
-            }
-            else {
+            } else {
                 this.account = ret.account;
                 this.sign = ret.sign;
                 Http.instance.URL = "http://" + this.SI.hall;
@@ -95,7 +97,8 @@ export class UserData {
                 }
             }
         };
-        PopUI.instance.show("正在登录游戏 account + sign = " + this.account + "  " + this.sign);
+        debugInfo.instance.addInfo("正在登录游戏 account + sign = " + this.account + "  " + this.sign);
+        PopUI.instance.showWait("登录中");
         Http.instance.sendRequest("/login", { account: this.account, sign: this.sign }, onLogin);
     }
 
