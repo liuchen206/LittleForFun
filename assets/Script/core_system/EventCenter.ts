@@ -4,6 +4,7 @@ const { ccclass, property } = cc._decorator;
  */
 export enum EventType {
     TEST_EVENT = "TEST_EVENT",
+    SomePopUIClosed = "SomePopUIClosed",
 }
 /**
  * EventCenter 作为常驻节点，管理了所以节点的事件注册与派发（这个与网络派发的消息不同，这属于客户端本地传递消息）
@@ -56,13 +57,14 @@ export default class EventCenter extends cc.Component {
      * @param eventname 事件名字
      * @param data 传参
      */
-    dispatchEvent(eventname, data) {
-        if (data === undefined) {
+    dispatchEvent(eventname, data?: any) {
+        if (data == null) {
             data = 'None';
         }
         if (this._events[eventname] != undefined) {
             let handlers = this._events[eventname];
             for (let index = 0; index < handlers.length; index++) {
+
                 let handler = handlers[index];
                 handler.callback.call(handler.target, data);
             }

@@ -2,7 +2,7 @@ import { VM } from "../../tools/modelView/ViewModel";
 import Http from "./Http";
 import PopUI from "./PopUI";
 import debugInfo from "./debugInfo";
-import { localStorageGet, localStorageMap, localStorageSet } from "../../tools/Tools";
+import { localStorageGet, localStorageMap, localStorageSet, waitForTime } from "../../tools/Tools";
 
 export class UserData {
     accountSet: string = ""; // 测试用的本地url，加的账户参数
@@ -71,7 +71,7 @@ export class UserData {
     /**
      * 在账号信息设置完毕之后，进行登录请求
      */
-    login() {
+    async login() {
         let self = this;
         var onLogin = function (ret) {
             if (ret.errcode !== 0) {
@@ -99,6 +99,7 @@ export class UserData {
         };
         debugInfo.instance.addInfo("正在登录游戏 account + sign = " + this.account + "  " + this.sign);
         PopUI.instance.showWait("登录中");
+        await waitForTime(0.5); // 停一下，太快看不清楚
         Http.instance.sendRequest("/login", { account: this.account, sign: this.sign }, onLogin);
     }
 

@@ -1,18 +1,60 @@
 import { waitForAction, waitForTime } from "./Tools";
+import EventCenter, { EventType } from "../Script/core_system/EventCenter";
 
 const { ccclass, property } = cc._decorator;
-
+enum StartActType {
+    none = 0,
+    popOut,
+    fadeOut,
+    fadeIn,
+}
+enum TouchActType {
+    none = 0,
+    pressAct,
+    destory,
+}
+/**
+ * 该脚本为节点预设值了若干常用的动作，比如弹出窗口动作，延时出现动作，延时消失动作，触摸Q弹动画示意点中目标动作，触摸自动销毁动作等
+ */
 @ccclass
 export default class UINodeActions extends cc.Component {
     @property({
-        tooltip: 'enter 动画的延时播放帧数',
+        tooltip: '按下时的行为模式',
+        type: cc.Enum(TouchActType)
+    })
+    public pressAction: TouchActType = TouchActType.none;
+
+    @property({
+        tooltip: 'start时的行为模式，会根据条件显示对应的动作参数配置',
+        type: cc.Enum(StartActType)
+    })
+    public startAction: StartActType = StartActType.none;
+
+
+    @property({
+        tooltip: 'start时动画的延时播放帧数',
+        visible: function () { return this.startAction !== StartActType.none }
     })
     delayFrameForEnterAct: number = 0;
 
     @property({
-        tooltip: '是否需要播放韵律动画',
+        tooltip: 'start动画结束后是否需要保持呼吸动画',
+        visible: function () { return this.startAction !== StartActType.none }
     })
     isNeedDoRhythm: boolean = false;
+
+    @property({
+        tooltip: '当没有任何按下动作设置时，是否需要屏蔽掉本节点上的触摸事件',
+        visible: function () { return this.pressAction == TouchActType.none }
+    })
+    isNeedBlock: boolean = false;
+
+    @property({
+        tooltip: '当按下动作设置为销毁节点时，可以设置一个销毁节点。不设置默认删除脚本所在的节点',
+        visible: function () { return this.pressAction == TouchActType.destory },
+        type: cc.Node,
+    })
+    rootNode: cc.Node = null;
     // LIFE-CYCLE CALLBACKS:
 
     onLoad() {
@@ -20,21 +62,75 @@ export default class UINodeActions extends cc.Component {
     }
 
     start() {
+
     }
     onEnable() {
-        this.doEnterAciton();
+        if (this.startAction == StartActType.popOut) this.doEnterAcitonPopout();
+        if (this.startAction == StartActType.fadeIn) this.doEnterAcitonFadeIn();
+        if (this.startAction == StartActType.fadeOut) this.doEnterAcitonFadeOut();
+        if (this.pressAction !== TouchActType.none) {
+            this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this, true);
+        } else {
+            if (this.isNeedBlock) this.node.addComponent(cc.BlockInputEvents);
+        }
+
     }
     onDisable() {
-
+        this.node.stopAllActions();
+        if (this.pressAction !== TouchActType.none) {
+            this.node.off(cc.Node.EventType.TOUCH_START, this.onTouchStart, this, true);
+        } else {
+            let block = this.node.getComponent(cc.BlockInputEvents);
+            if (block) {
+                this.node.removeComponent(cc.BlockInputEvents);
+            }
+        }
     }
     // update (dt) {}
 
     onTouchStart(event: cc.Event.EventTouch) {
-        if (this.node.getNumberOfRunningActions() > 0) return;
-        this.doPressAction();
+        if (this.pressAction == TouchActType.destory) {
+            if (this.rootNode == null) {
+                this.node.destroy();
+            } else {
+                this.rootNode.destroy();
+            }
+        }
+        if (this.pressAction == TouchActType.pressAct) this.doPressAction();
+
     }
-    async doEnterAciton() {
-        // await waitForTime(0);
+    /**
+     * 节点慢慢淡出
+     */
+    async doEnterAcitonFadeOut() {
+        let delay = cc.delayTime(this.delayFrameForEnterAct / 60);
+        let fade = cc.fadeOut(1.5);
+        if (this.isNeedDoRhythm) {
+            await waitForAction(this.node, ...[delay, fade]);
+            this.doRhythm();
+        } else {
+            this.node.runAction(cc.sequence([delay, fade]));
+        }
+    }
+    /**
+     * 节点慢慢淡入
+     */
+    async doEnterAcitonFadeIn() {
+        this.node.opacity = 0;
+        let delay = cc.delayTime(this.delayFrameForEnterAct / 60);
+        let fade = cc.fadeIn(1.5);
+        if (this.isNeedDoRhythm) {
+            await waitForAction(this.node, ...[delay, fade]);
+            this.doRhythm();
+        } else {
+            this.node.runAction(cc.sequence([delay, fade]));
+        }
+
+    }
+    /**
+     * 节点慢慢弹出
+     */
+    async doEnterAcitonPopout() {
         // doinit
         this.node.scale = 0;
         // make action
@@ -51,7 +147,9 @@ export default class UINodeActions extends cc.Component {
             this.node.runAction(cc.sequence(actList));
         }
     }
-
+    /**
+     * 节点Q弹动作
+     */
     doPressAction() {
         // doinit
         this.node.scale = 1;
@@ -64,7 +162,9 @@ export default class UINodeActions extends cc.Component {
         actList.push(scale1, scale2, scale3, scale4);
         this.node.runAction(cc.sequence(actList));
     }
-
+    /**
+     * 节点心跳动作
+     */
     doRhythm() {
         // doinit
         this.node.scale = 1;

@@ -126,7 +126,7 @@ export default class loading extends cc.Component {
      * 预加载场景，给界面一个都进度的效果
      */
     async startPreloading() {
-        await waitForTime(1); // 停一下，太快看不清楚
+        await waitForTime(1.5); // 停一下，太快看不清楚
         this._stateStr = "正在加载资源，请稍候";
         this._isLoading = true;
         var self = this;

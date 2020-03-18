@@ -1,5 +1,6 @@
 import { checkInit } from "../core_system/SomeRepeatThing";
 import EventCenter, { EventType } from "../core_system/EventCenter";
+import { waitForTime } from "../../tools/Tools";
 
 const { ccclass, property } = cc._decorator;
 
@@ -35,14 +36,27 @@ export default class PopWaiting extends cc.Component {
         if (this.eventTypeSet) {
             EventCenter.instance.RemoveListener(this.eventTypeSet, this);
         }
+        /**
+         * 我无法理解的领域
+         * 当在 onDestroy 中使用 EventCenter.instance.dispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed") 时，onDestroy 会进入两次。
+         * 解决办法。在下一帧使用 EventCenter.instance.dispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed")
+         */
+        this.againReenterOnDestory();
     }
-
+    /**
+     * 只为延时一帧执行
+     */
+    async againReenterOnDestory() {
+        console.log(" SomePopUIClosed  onDestroy   againReenterOnDestory");
+        await waitForTime(0);
+        EventCenter.instance.dispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed")
+    }
     /**
      * 
      * @param text 展示的title名字
      * @param waitForEvent 触发退出wait的事件名字
      */
-    show(text: string, waitForEvent?: EventType) {
+    init(text: string, waitForEvent?: EventType) {
         this.titlelabel.string = text;
         if (waitForEvent) {
             this.eventTypeSet = waitForEvent;
