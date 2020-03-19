@@ -36,7 +36,7 @@ export default class debugInfo extends cc.Component {
      */
     addInfo(text: string, ...otherString: string[]) {
         if (this.isUsed == false) return;
-        if (this.node.childrenCount >= 11) {
+        if (this.node.childrenCount >= 7) {
             for (let i = 0; i < this.node.childrenCount; i++) {
                 this.node.children[i].removeFromParent();
             }

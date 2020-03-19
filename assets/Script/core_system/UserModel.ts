@@ -3,6 +3,7 @@ import Http from "./Http";
 import PopUI from "./PopUI";
 import debugInfo from "./debugInfo";
 import { localStorageGet, localStorageMap, localStorageSet, waitForTime } from "../../tools/Tools";
+import Net from "./Net";
 
 export class UserData {
     accountSet: string = ""; // 测试用的本地url，加的账户参数
@@ -98,7 +99,7 @@ export class UserData {
             }
         };
         debugInfo.instance.addInfo("正在登录游戏 account + sign = " + this.account + "  " + this.sign);
-        PopUI.instance.showWait("登录中");
+        PopUI.instance.showWait("正在登录");
         await waitForTime(0.5); // 停一下，太快看不清楚
         Http.instance.sendRequest("/login", { account: this.account, sign: this.sign }, onLogin);
     }
@@ -126,11 +127,41 @@ export class UserData {
         Http.instance.sendRequest("/create_user", data, onCreate);
     }
 }
+
+export class MajiangData {
+    dissoveData: any = null;
+
+    async connectGameServer(data) {
+        this.dissoveData = null;
+        Net.instance.ip = data.ip + ":" + data.port;
+        debugInfo.instance.addInfo("麻将ip = ", Net.instance.ip);
+
+        var self = this;
+        var onConnectOK = function () {
+            console.log("onConnectOK");
+            var sd = {
+                token: data.token,
+                roomid: data.roomid,
+                time: data.time,
+                sign: data.sign,
+            };
+            Net.instance.send("login", sd);
+        };
+
+        var onConnectFailed = function () {
+            console.log("failed.");;
+        };
+        PopUI.instance.showWait("正在进入房间");
+        await waitForTime(0.5); // 停一下，太快看不清楚
+        Net.instance.connect(onConnectOK, onConnectFailed);
+    }
+}
 //原始数据
 export let userData: UserData = new UserData();
+export let majiangData: MajiangData = new MajiangData();
 //数据模型绑定,定义后不能修改顺序
 VM.add(userData, 'userData');    //定义全局tag
-
+VM.add(majiangData, 'majiangData'); 
 //使用注意事项
 //VM 得到的回调 onValueChanged ，不能强制修改赋值
 //VM 的回调 onValueChanged 中，不能直接操作VM数据结构,否则会触发 循环调用

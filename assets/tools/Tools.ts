@@ -21,7 +21,7 @@ export let localStorageMap = {
     testData: "testData",
     wx_account: "wx_account",
     wx_sign: "wx_sign",
-    yk_account:"yk_account"
+    yk_account: "yk_account"
 };
 /**
  * 
@@ -164,4 +164,14 @@ export function waitForTime(interval: number) {
     return new Promise(resolve => {
         cc.Camera.main.scheduleOnce(resolve, interval);
     })
+}
+
+export function quickCreateEventHandler(targetNode: cc.Node, callbackScriptName: string, callbackFuncName: string, customData?) {
+    var ok = new cc.Component.EventHandler();
+    ok.target = targetNode; // 这个 node 节点是你的事件处理代码组件所属的节点
+    ok.component = callbackScriptName;// 这个是代码文件名
+    ok.handler = callbackFuncName;
+    ok.customEventData = customData;
+
+    return ok;
 }

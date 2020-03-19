@@ -22,7 +22,7 @@ export default class Net extends cc.Component {
     }
 
     // update (dt) {}
-    
+
     /**
      * 注册一个网络消息的回调
      * @param event 注册的时间名
@@ -43,6 +43,8 @@ export default class Net extends cc.Component {
         };
 
         this.handlers[event] = handler;
+        console.log("sio", this.sio);
+
         if (this.sio) {
             console.log("register:function " + event);
             this.sio.on(event, handler);

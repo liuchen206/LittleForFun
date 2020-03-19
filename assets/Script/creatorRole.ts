@@ -1,5 +1,6 @@
 import { userData } from "./core_system/UserModel";
 import { checkInit } from "./core_system/SomeRepeatThing";
+import PopUI from "./core_system/PopUI";
 
 const { ccclass, property } = cc._decorator;
 
@@ -25,8 +26,9 @@ export default class creatorRole extends cc.Component {
 
     onOKClicked() {
         var name = this.nameEditor.string;
-        if(name == ""){
+        if (name == "") {
             console.log("invalid name.");
+            PopUI.instance.showDialog("错误", "名字不能为空");
             return;
         }
         console.log(name);

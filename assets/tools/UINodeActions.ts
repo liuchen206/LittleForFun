@@ -128,7 +128,7 @@ export default class UINodeActions extends cc.Component {
 
     }
     /**
-     * 节点慢慢弹出
+     * 节点弹出
      */
     async doEnterAcitonPopout() {
         // doinit
