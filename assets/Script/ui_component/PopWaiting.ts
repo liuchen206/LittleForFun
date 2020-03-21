@@ -63,6 +63,11 @@ export default class PopWaiting extends cc.Component {
             EventCenter.instance.AddListener(waitForEvent, (d) => {
                 this.node.destroy();
             }, this)
+        } else {
+            this.eventTypeSet = EventType.WaitEnd;
+            EventCenter.instance.AddListener(this.eventTypeSet, (d) => {
+                this.node.destroy();
+            }, this)
         }
     }
 

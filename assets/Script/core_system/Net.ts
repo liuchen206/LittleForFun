@@ -31,7 +31,9 @@ export default class Net extends cc.Component {
     addHandler(event, fn) {
         if (this.handlers[event]) {
             console.log("event:" + event + "' handler has been registered.");
-            return;
+            console.log("所以该事件将会被重新注册，覆盖上次的注册");
+            
+            this.handlers[event] = null;
         }
 
         var handler = function (data) {

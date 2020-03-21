@@ -8,7 +8,21 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class hall extends cc.Component {
-
+    @property({
+        type: cc.Button,
+        tooltip: '快速开始按钮'
+    })
+    quickBtn: cc.Button = null;
+    @property({
+        type: cc.Button,
+        tooltip: '返回房间按钮'
+    })
+    backRoomBtn: cc.Button = null;
+    @property({
+        type: cc.Button,
+        tooltip: '加入房间按钮'
+    })
+    joinRoomBtn: cc.Button = null;
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
@@ -20,6 +34,18 @@ export default class hall extends cc.Component {
             console.log("login_finished");
             cc.director.loadScene("mjgame");
         });
+
+        console.log("登录时的 房间id 为", userData.roomData);
+
+        if (userData.roomData == null) {
+            this.quickBtn.interactable = true;
+            this.backRoomBtn.interactable = false;
+            this.joinRoomBtn.interactable = true;
+        } else {
+            this.quickBtn.interactable = false;
+            this.backRoomBtn.interactable = true;
+            this.joinRoomBtn.interactable = false;
+        }
     }
 
     // update (dt) {}
@@ -62,5 +88,12 @@ export default class hall extends cc.Component {
         };
         console.log(data);
         Http.instance.sendRequest("/create_private_room", data, onCreate);
+    }
+    onBackToRoom() {
+        userData.enterRoom(userData.roomData);
+        userData.roomData = null;
+    }
+    onJoinRoom() {
+        PopUI.instance.showJoinRoomInput();
     }
 }

@@ -4,6 +4,7 @@ const { ccclass, property } = cc._decorator;
  */
 export enum EventType {
     TEST_EVENT = "TEST_EVENT",
+    WaitEnd = "WaitEnd",
     SomePopUIClosed = "SomePopUIClosed",
 }
 /**

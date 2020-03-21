@@ -30,6 +30,12 @@ export default class PopUI extends cc.Component {
         tooltip: "确认或取消界面"
     })
     dialogPrefab: cc.Prefab = null;
+
+    @property({
+        type: cc.Prefab,
+        tooltip: "加入房间界面"
+    })
+    joinRootPrefab: cc.Prefab = null;
     // LIFE-CYCLE CALLBACKS:
 
     onLoad() {
@@ -89,11 +95,15 @@ export default class PopUI extends cc.Component {
      * 这意味这，尚未弹出的UI，是不会带到下一个场景中的，这也符合设计的要求（不会再下个场景 弹出上个场景的UI）
      * 
      * @param node 弹出的ui节点
+     * @param isForceShow 是否需要立即展示，不用按顺序出现
+     * 
      */
-    private addPopUI(node) {
+    private addPopUI(node, isForceShow?: boolean) {
         if (this.isHasUnPopedUI() == true) {
             node.active = false;
         }
+        if (isForceShow == true) node.active = true;
+
         this.getPopUIRoot().addChild(node);
     }
     /**
@@ -104,7 +114,7 @@ export default class PopUI extends cc.Component {
     showWait(text: string, waitForEvent?: EventType) {
         let waitUI = cc.instantiate(this.waitPrefab);
         waitUI.getComponent(PopWaiting).init(text, waitForEvent);
-        this.addPopUI(waitUI);
+        this.addPopUI(waitUI, true);
     }
     /**
      * 展示一个确定取消UI
@@ -112,10 +122,19 @@ export default class PopUI extends cc.Component {
      * @param content 内容描述文字
      * @param okCallBack ok按钮回调
      * @param cancelCallBack cancel按钮回调
+     * @param isForceShow 是否需要立即展示，不用按顺序出现
      */
-    showDialog(title: string, content: string, okCallBack?: cc.Component.EventHandler, cancelCallBack?: cc.Component.EventHandler) {
+    showDialog(title: string, content: string, okCallBack?: cc.Component.EventHandler, cancelCallBack?: cc.Component.EventHandler, isForceShow?: boolean) {
         let dialogUI = cc.instantiate(this.dialogPrefab);
         dialogUI.getComponent(PopDialog).init(title, content, okCallBack, cancelCallBack);
-        this.addPopUI(dialogUI);
+        this.addPopUI(dialogUI, isForceShow);
+    }
+
+    /**
+     * 展示加入房间输入房号界面
+     */
+    showJoinRoomInput() {
+        let joinUI = cc.instantiate(this.joinRootPrefab);
+        this.addPopUI(joinUI);
     }
 }

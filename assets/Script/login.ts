@@ -43,6 +43,7 @@ export default class login extends cc.Component {
      * ui 中游客按钮点击
      */
     onYKClicked() {
-        userData.guestAuth(true);
+        // userData.guestAuth(true);
+        userData.guestAuth(false);
     }
 }
