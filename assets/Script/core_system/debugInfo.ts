@@ -52,6 +52,5 @@ export default class debugInfo extends cc.Component {
         console.log('\n');
         console.log("------NET SERVER TO CLINE-----", content);
         console.log('\n');
-
     }
 }
