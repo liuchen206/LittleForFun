@@ -81,8 +81,8 @@ export default class loading extends cc.Component {
                 userData.SI = ret;
 
 
-                debugInfo.instance.addInfo("_checkVersion SI.hall ", userData.SI.hall);
-                debugInfo.instance.addInfo("_checkVersion loading ", Http.instance.URL);
+                debugInfo.instance.addInfo("loading SI.hall rul", userData.SI.hall);
+                debugInfo.instance.addInfo("loading url", Http.instance.URL);
                 debugInfo.instance.addInfo("新版本号为", ret.version, "旧版本号为", Http.instance.VERSION.toString());
                 if (ret.version != Http.instance.VERSION) {
                     //将要进行更新 todo

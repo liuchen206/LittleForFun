@@ -42,8 +42,6 @@ export class UserData {
         }
         if (isForceCreateNew == true) account = "randomAccount" + Math.floor(Math.random() * 1000000);
 
-        debugInfo.instance.addInfo("游客账号信息 account ", account)
-
         Http.instance.sendRequest("/guest", { account: account }, (ret) => {
             if (ret.errcode !== 0) {
                 console.log(ret.errmsg);
@@ -65,8 +63,6 @@ export class UserData {
             console.log(ret.errmsg);
         }
         else {
-            debugInfo.instance.addInfo("渠道平台账号信息 account+sign ", ret.account, ret.sign)
-
             self.account = ret.account;
             self.sign = ret.sign;
             Http.instance.URL = "http://" + this.SI.hall;
@@ -81,7 +77,6 @@ export class UserData {
         var onLogin = function (ret) {
             if (ret.errcode !== 0) {
                 console.log(ret.errmsg);
-                debugInfo.instance.addInfo("onLogin err", ret.errmsg);
             } else {
                 if (!ret.userid) {
                     //jump to register user info.
@@ -102,7 +97,6 @@ export class UserData {
                 }
             }
         };
-        debugInfo.instance.addInfo("正在登录游戏 account + sign = " + this.account + "  " + this.sign);
         PopUI.instance.showWait("正在登录");
         await waitForTime(0.5); // 停一下，太快看不清楚
         Http.instance.sendRequest("/login", { account: this.account, sign: this.sign }, onLogin);
@@ -176,12 +170,12 @@ export class MajiangData {
     dissoveData: any = null;
     dataEventHandler: any = null;
     roomId: any = null;
-    conf: any = null;
+    conf: any = null; // 描述了这个房间的信息，比如 玩法，玩法设置等
     maxNumOfGames: number = 0;
     numOfGames: number = 0;
     numOfMJ: number = 0;
-    seatIndex: number = 0;
-    seats: Array<any> = [];
+    seatIndex: number = 0; // 服务器分配给我的座位号
+    seats: Array<any> = []; // 服务器中的座位信息
     turn: number = 0;
     button: number = 0;
     dingque: number = 0;
@@ -191,6 +185,28 @@ export class MajiangData {
     gamestate: string = "";
     isOver: boolean = false;
 
+    /**
+     * 将服务器的座位号，转换为本地ui上的节点索引。
+     * 因为在客户端界面自己总是显示在下方的座位上，无论服务器给自己分配的座位号是多少，只保证上下家关系一直即可
+     * @param index 服务器座位号
+     */
+    getLocalIndex(index) {
+        var ret = (index - this.seatIndex + 4) % 4;
+        return ret;
+    }
+    /**
+     * 通过玩家的id返回自己的座位信息
+     * @param userId 玩家的id
+     */
+    getSeatByID(userId) {
+        var seatIndex = this.getSeatIndexByID(userId);
+        if (seatIndex == -1) return null;
+        return this.seats[seatIndex];
+    }
+    /**
+     * 通过玩家id返回自己的服务器座位号
+     * @param userId 玩家的id
+     */
     getSeatIndexByID(userId) {
         for (var i = 0; i < this.seats.length; ++i) {
             var s = this.seats[i];
@@ -200,11 +216,14 @@ export class MajiangData {
         }
         return -1;
     }
-
+    /**
+     * 
+     * @param data 连接麻将服的数据，数据是在创建房间或者进入房间时，由服务器返回。
+     */
     async connectGameServer(data) {
         this.dissoveData = null;
         Net.instance.ip = data.ip + ":" + data.port;
-        debugInfo.instance.addInfo("麻将ip = ", Net.instance.ip);
+        debugInfo.instance.addInfo("麻将服ip = ", Net.instance.ip);
 
         var self = this;
         var onConnectOK = function () {

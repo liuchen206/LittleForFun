@@ -28,10 +28,13 @@
     "_components": [
       {
         "__id__": 9
+      },
+      {
+        "__id__": 10
       }
     ],
     "_prefab": {
-      "__id__": 10
+      "__id__": 11
     },
     "_opacity": 255,
     "_color": {
@@ -234,17 +237,17 @@
     "_prefab": {
       "__id__": 8
     },
-    "_opacity": 255,
+    "_opacity": 200,
     "_color": {
       "__type__": "cc.Color",
-      "r": 87,
-      "g": 77,
-      "b": 77,
+      "r": 56,
+      "g": 50,
+      "b": 50,
       "a": 255
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 160,
+      "width": 480,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -295,8 +298,8 @@
       }
     ],
     "_useOriginalSize": false,
-    "_string": "提示信息",
-    "_N$string": "提示信息",
+    "_string": "提示信息提示信息提示信息",
+    "_N$string": "提示信息提示信息提示信息",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -335,6 +338,33 @@
     "text": {
       "__id__": 7
     },
+    "_id": ""
+  },
+  {
+    "__type__": "cc.Widget",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "alignMode": 1,
+    "_target": null,
+    "_alignFlags": 40,
+    "_left": 0,
+    "_right": 0,
+    "_top": 0,
+    "_bottom": 0,
+    "_verticalCenter": 0,
+    "_horizontalCenter": 0,
+    "_isAbsLeft": true,
+    "_isAbsRight": true,
+    "_isAbsTop": true,
+    "_isAbsBottom": true,
+    "_isAbsHorizontalCenter": true,
+    "_isAbsVerticalCenter": true,
+    "_originalWidth": 1280,
+    "_originalHeight": 0,
     "_id": ""
   },
   {

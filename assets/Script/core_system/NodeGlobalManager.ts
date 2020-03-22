@@ -27,7 +27,6 @@ export default class NodeGlobalManager extends cc.Component {
         // EventCenter.instance.RemoveListener(EventType.TEST_EVENT, this);
         // EventCenter.instance.dispatchEvent(EventType.TEST_EVENT, 789);
 
-        // debugInfo.instance.addInfo("ahahhahaha");
     }
 
     // update (dt) {}

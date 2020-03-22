@@ -46,4 +46,12 @@ export default class debugInfo extends cc.Component {
         n.getComponent(cc.Label).string = text + " " + otherString.join(" ");
         this.node.addChild(n);
     }
+
+    logInfoFromServer(text: string, ...otherString: string[]) {
+        let content = text + " " + otherString.join(" ");
+        console.log('\n');
+        console.log("------NET SERVER TO CLINE-----", content);
+        console.log('\n');
+
+    }
 }

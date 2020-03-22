@@ -24,19 +24,20 @@ export default class login extends cc.Component {
         if (!checkInit()) return;
 
         // 让我测试下
-        let ok = quickCreateEventHandler(this.node, 'login', 'okClick', 'customEventData');
-        PopUI.instance.showDialog("成功", "开始登录", ok);
+        // let ok = quickCreateEventHandler(this.node, 'login', 'okClick', 'customEventData');
+        // PopUI.instance.showDialog("成功", "开始登录", ok);
     }
-    async okClick(eve, data) {
-        console.log("dialog ok click");
-        PopUI.instance.showDialog("嘿嘿", "你刚刚是不是点了OK");
+    // async okClick(eve, data) {
+    //     console.log("dialog ok click");
+    //     PopUI.instance.showDialog("嘿嘿", "你刚刚是不是点了OK");
 
-        ToastUI.instance.showToast("让我提示你 1 下");
-        // await waitForTime(0.5);
-        // ToastUI.instance.showToast("让我提示你 2 下");
-        // await waitForTime(0.5);
-        // ToastUI.instance.showToast("让我提示你 3 下");
-    }
+    //     ToastUI.instance.showToast("让我提示你 1 下");
+    //     await waitForTime(0.5);
+    //     ToastUI.instance.showToast("让我提示你 2 下");
+    //     await waitForTime(0.5);
+    //     ToastUI.instance.showToast("让我提示你 3 下");
+    // }
+
     // update (dt) {}
 
     /**

@@ -26,12 +26,12 @@
     "_prefab": {
       "__id__": 3
     },
-    "_opacity": 255,
+    "_opacity": 161,
     "_color": {
       "__type__": "cc.Color",
-      "r": 0,
-      "g": 0,
-      "b": 0,
+      "r": 68,
+      "g": 55,
+      "b": 55,
       "a": 255
     },
     "_contentSize": {
@@ -49,7 +49,7 @@
       "ctor": "Float64Array",
       "array": [
         0,
-        25.2,
+        0,
         0,
         0,
         0,
@@ -111,7 +111,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "412e9ccd-60ab-4ff4-b6d8-44efb772bb4c"
     },
     "fileId": "bcE58DCFdKYamNepSCBZcL",
     "sync": false

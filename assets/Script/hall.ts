@@ -3,6 +3,7 @@ import PopUI from "./core_system/PopUI";
 import { majiangData, userData } from "./core_system/UserModel";
 import Http from "./core_system/Http";
 import Net from "./core_system/Net";
+import debugInfo from "./core_system/debugInfo";
 
 const { ccclass, property } = cc._decorator;
 
@@ -30,11 +31,6 @@ export default class hall extends cc.Component {
     start() {
         if (!checkInit()) return;
 
-        Net.instance.addHandler("login_finished", function (data) {
-            console.log("login_finished");
-            cc.director.loadScene("mjgame");
-        });
-
         console.log("登录时的 房间id 为", userData.roomData);
 
         if (userData.roomData == null) {
@@ -57,8 +53,7 @@ export default class hall extends cc.Component {
                 //console.log(ret.errmsg);
                 if (ret.errcode == 2222) {
                     PopUI.instance.showDialog("抱歉", "房卡不足，创建房间失败!");
-                }
-                else {
+                } else {
                     PopUI.instance.showDialog("抱歉", "创建房间失败,错误码:" + ret.errcode);
                 }
             }
