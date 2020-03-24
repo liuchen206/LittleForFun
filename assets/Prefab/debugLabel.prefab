@@ -26,12 +26,12 @@
     "_prefab": {
       "__id__": 3
     },
-    "_opacity": 161,
+    "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 68,
-      "g": 55,
-      "b": 55,
+      "r": 0,
+      "g": 0,
+      "b": 0,
       "a": 255
     },
     "_contentSize": {

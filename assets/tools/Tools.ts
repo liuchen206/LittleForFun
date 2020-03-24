@@ -166,6 +166,14 @@ export function waitForTime(interval: number) {
     })
 }
 
+
+/**
+ * 按引擎按钮的回调函数要求，创建一个让按钮使用的回调
+ * @param targetNode 回调所在节点
+ * @param callbackScriptName 回调所在的脚本名字
+ * @param callbackFuncName 回调函数的名字
+ * @param customData 自定义传的数据
+ */
 export function quickCreateEventHandler(targetNode: cc.Node, callbackScriptName: string, callbackFuncName: string, customData?) {
     var ok = new cc.Component.EventHandler();
     ok.target = targetNode; // 这个 node 节点是你的事件处理代码组件所属的节点
@@ -174,4 +182,12 @@ export function quickCreateEventHandler(targetNode: cc.Node, callbackScriptName:
     ok.customEventData = customData;
 
     return ok;
+}
+
+export function PrefixInteger(num, length, char?: string) {
+    let joinChar = '0';
+    if (char) {
+        joinChar = char;
+    }
+    return (Array(length).join(joinChar) + num).slice(-length);
 }

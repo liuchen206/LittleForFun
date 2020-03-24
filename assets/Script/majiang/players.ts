@@ -49,7 +49,7 @@ export default class players extends cc.Component {
     }) {
         let localSeatIndex = majiangData.getLocalIndex(playData.seatindex);
         let player = this._getPlayerBySeatID(localSeatIndex);
-        player.getChildByName("name").getComponent(cc.Label).string = "名字：" + playData.name;
+        player.getChildByName("name").getComponent(cc.Label).string = "名字：" + (playData.name == "" ? "没有玩家" : playData.name);
         player.getChildByName("score").getComponent(cc.Label).string = "得分：" + playData.score;
         player.getChildByName("online").getComponent(cc.Label).string = "在线：" + playData.online;
         player.getChildByName("ready").getComponent(cc.Label).string = "准备: " + playData.ready;

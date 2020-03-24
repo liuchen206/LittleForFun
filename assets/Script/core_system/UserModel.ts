@@ -184,7 +184,36 @@ export class MajiangData {
     isHuanSanZhang: boolean = false;
     gamestate: string = "";
     isOver: boolean = false;
+    huanpaimethod: any = null;
+    curaction: any = null;
 
+    /**
+     * 重置麻將游戲数据
+     */
+    reset() {
+        this.turn = -1;
+        this.chupai = -1;
+        this.dingque = -1;
+        this.button = -1;
+        this.gamestate = "";
+        this.dingque = -1;
+        this.isDingQueing = false;
+        this.isHuanSanZhang = false;
+        this.curaction = null;
+        for (var i = 0; i < this.seats.length; ++i) {
+            this.seats[i].holds = [];
+            this.seats[i].folds = [];
+            this.seats[i].pengs = [];
+            this.seats[i].angangs = [];
+            this.seats[i].diangangs = [];
+            this.seats[i].wangangs = [];
+            this.seats[i].dingque = -1;
+            this.seats[i].ready = false;
+            this.seats[i].hued = false;
+            this.seats[i].huanpais = null;
+            this.huanpaimethod = -1;
+        }
+    }
     /**
      * 将服务器的座位号，转换为本地ui上的节点索引。
      * 因为在客户端界面自己总是显示在下方的座位上，无论服务器给自己分配的座位号是多少，只保证上下家关系一直即可
@@ -215,6 +244,22 @@ export class MajiangData {
             }
         }
         return -1;
+    }
+    /**
+     * 游戏是否开始
+     */
+    isGameStart() {
+        if (this.gamestate == "") {
+            return false;
+        }
+        return true;
+    }
+    /**
+     * 我自己是否是房主
+     */
+    isRoomCreator() {
+        if (userData.userId == this.conf.creator) return true;
+        return false;
     }
     /**
      * 

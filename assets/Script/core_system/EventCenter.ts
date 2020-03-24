@@ -6,6 +6,10 @@ export enum EventType {
     TEST_EVENT = "TEST_EVENT",
     WaitEnd = "WaitEnd",
     SomePopUIClosed = "SomePopUIClosed",
+    updateMJTable = "updateMJTable",
+    onDissolveNotice = "onDissolveNotice",
+    onDissolveFailed = "onDissolveFailed",
+    onGameOver = "onGameOver",
 }
 /**
  * EventCenter 作为常驻节点，管理了所以节点的事件注册与派发（这个与网络派发的消息不同，这属于客户端本地传递消息）
@@ -28,7 +32,7 @@ export default class EventCenter extends cc.Component {
      * 向某一节点监听特定事件
      * @param eventname 事件名字
      * @param callback 事件回调
-     * @param target 监听节点
+     * @param target 监听对象
      */
     AddListener(eventname, callback, target) {
         if (this._events[eventname] == undefined) {

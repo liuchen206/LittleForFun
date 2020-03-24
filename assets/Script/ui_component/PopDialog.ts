@@ -18,15 +18,25 @@ export default class PopDialog extends cc.Component {
         tooltip: "说明内容"
     })
     contentLabel: cc.Label = null
+    @property({
+        type: cc.Label,
+        tooltip: "ok按钮说明文字"
+    })
+    okLabel: cc.Label = null
+    @property({
+        type: cc.Label,
+        tooltip: "cancel按钮说明文字"
+    })
+    cancelLabel: cc.Label = null
 
     @property({
         type: cc.Node,
-        tooltip: "确定按钮"
+        tooltip: "确定按钮节点,在未设置回调时，隐藏按钮"
     })
     okBtn: cc.Node = null
     @property({
         type: cc.Node,
-        tooltip: "取消按钮"
+        tooltip: "取消按钮节点,在未设置回调时，隐藏按钮"
     })
     cancelBtn: cc.Node = null
     // LIFE-CYCLE CALLBACKS:
@@ -50,8 +60,10 @@ export default class PopDialog extends cc.Component {
      * @param content 内容
      * @param okCallBack ok按钮
      * @param cancelCallBack cancel按钮
+     * @param okText 自定义的'确认'按钮说明文字
+     * @param cancleText 自定义的'取消'按钮说明文字
      */
-    init(title: string, content: string, okCallBack?: cc.Component.EventHandler, cancelCallBack?: cc.Component.EventHandler) {
+    init(title: string, content: string, okCallBack?: cc.Component.EventHandler, cancelCallBack?: cc.Component.EventHandler, okText?: string, cancleText?: string) {
         this.titleLabel.string = title;
         this.contentLabel.string = content;
         if (okCallBack) {
@@ -66,6 +78,22 @@ export default class PopDialog extends cc.Component {
             this.cancelBtn.getComponent(cc.Button).clickEvents.push(cancelCallBack);
         } else {
             this.cancelBtn.active = false;
+        }
+        if (okText) {
+            this.okLabel.string = okText;
+        } else {
+            this.okLabel.string = "确定";
+        }
+        if (cancleText) {
+            this.cancelLabel.string = cancleText;
+        } else {
+            this.cancelLabel.string = "取消";
+        }
+
+        // 抄底判断：如果任何回调都没有
+        if(!okCallBack && !cancelCallBack){
+            this.okLabel.string = "了解";
+            this.okBtn.active = true;
         }
     }
     onDestroy() {

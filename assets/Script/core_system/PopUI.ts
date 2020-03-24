@@ -21,7 +21,7 @@ export default class PopUI extends cc.Component {
 
     @property({
         type: cc.Prefab,
-        tooltip: "阻止玩家操作，直到事件发生"
+        tooltip: "等待界面，阻止玩家操作，直到事件发生"
     })
     waitPrefab: cc.Prefab = null;
 
@@ -30,12 +30,6 @@ export default class PopUI extends cc.Component {
         tooltip: "确认或取消界面"
     })
     dialogPrefab: cc.Prefab = null;
-
-    @property({
-        type: cc.Prefab,
-        tooltip: "加入房间界面"
-    })
-    joinRootPrefab: cc.Prefab = null;
     // LIFE-CYCLE CALLBACKS:
 
     onLoad() {
@@ -123,18 +117,12 @@ export default class PopUI extends cc.Component {
      * @param okCallBack ok按钮回调
      * @param cancelCallBack cancel按钮回调
      * @param isForceShow 是否需要立即展示，不用按顺序出现
+     * @param okText 自定义的'确认'按钮说明文字
+     * @param cancleText 自定义的'取消'按钮说明文字
      */
-    showDialog(title: string, content: string, okCallBack?: cc.Component.EventHandler, cancelCallBack?: cc.Component.EventHandler, isForceShow?: boolean) {
+    showDialog(title: string, content: string, okCallBack?: cc.Component.EventHandler, cancelCallBack?: cc.Component.EventHandler, isForceShow?: boolean, okText?: string, cancleText?: string) {
         let dialogUI = cc.instantiate(this.dialogPrefab);
-        dialogUI.getComponent(PopDialog).init(title, content, okCallBack, cancelCallBack);
+        dialogUI.getComponent(PopDialog).init(title, content, okCallBack, cancelCallBack, okText, cancleText);
         this.addPopUI(dialogUI, isForceShow);
-    }
-
-    /**
-     * 展示加入房间输入房号界面
-     */
-    showJoinRoomInput() {
-        let joinUI = cc.instantiate(this.joinRootPrefab);
-        this.addPopUI(joinUI);
     }
 }

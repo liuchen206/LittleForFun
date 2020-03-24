@@ -1,4 +1,3 @@
-import { checkInit } from "../core_system/SomeRepeatThing";
 import EventCenter, { EventType } from "../core_system/EventCenter";
 import { waitForTime } from "../../tools/Tools";
 

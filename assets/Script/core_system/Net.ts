@@ -29,13 +29,6 @@ export default class Net extends cc.Component {
      * @param fn 回调
      */
     addHandler(event, fn) {
-        if (this.handlers[event]) {
-            console.log("event:" + event + "' handler has been registered.");
-            console.log("所以该事件将会被重新注册，覆盖上次的注册");
-            
-            this.handlers[event] = null;
-        }
-
         var handler = function (data) {
             //console.log(event + "(" + typeof(data) + "):" + (data? data.toString():"null"));
             if (event != "disconnect" && typeof (data) == "string") {
@@ -43,6 +36,14 @@ export default class Net extends cc.Component {
             }
             fn(data);
         };
+
+        if (this.handlers[event]) {
+            // 这意味着一条网络消息只能有一个位置在监听。这样的设计有好有坏，酌情设计
+            console.log(event + " 注册过了，所以该事件将会被重新注册，覆盖上次的注册");
+
+            this.handlers[event] = null;
+            this.sio.removeListener(event, handler);
+        }
 
         this.handlers[event] = handler;
         console.log("sio", this.sio);

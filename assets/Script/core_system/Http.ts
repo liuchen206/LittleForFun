@@ -5,7 +5,9 @@ const { ccclass, property } = cc._decorator;
 export default class Http extends cc.Component {
     static instance: Http = null;
     // LIFE-CYCLE CALLBACKS:
-    URL: string = "http://47.111.248.48:9000";
+    // URL: string = "http://47.111.248.48:9000";
+    URL: string = "http://localhost:9000";
+    
     VERSION: number = 20161227;
 
     onLoad() {

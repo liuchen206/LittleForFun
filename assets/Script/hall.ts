@@ -24,6 +24,11 @@ export default class hall extends cc.Component {
         tooltip: '加入房间按钮'
     })
     joinRoomBtn: cc.Button = null;
+    @property({
+        type: cc.Node,
+        tooltip: '输入房间号界面'
+    })
+    enterRoomIDNode: cc.Node = null;
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
@@ -42,10 +47,13 @@ export default class hall extends cc.Component {
             this.backRoomBtn.interactable = true;
             this.joinRoomBtn.interactable = false;
         }
+        this.initView();
     }
 
     // update (dt) {}
-
+    initView() {
+        this.showJoinRoomInput(false);
+    }
     onQuickStart() {
         var self = this;
         var onCreate = function (ret) {
@@ -89,6 +97,9 @@ export default class hall extends cc.Component {
         userData.roomData = null;
     }
     onJoinRoom() {
-        PopUI.instance.showJoinRoomInput();
+        this.showJoinRoomInput(true);
+    }
+    showJoinRoomInput(isShow: boolean) {
+        this.enterRoomIDNode.active = isShow;
     }
 }
