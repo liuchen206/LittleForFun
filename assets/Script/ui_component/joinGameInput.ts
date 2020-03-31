@@ -153,8 +153,8 @@ export default class joinGameInput extends cc.Component {
         console.log(" SomePopUIClosed  onDestroy");
         /**
          * 我无法理解的领域
-         * 当在 onDestroy 中使用 EventCenter.instance.dispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed") 时，onDestroy 会进入两次。
-         * 解决办法。在下一帧使用 EventCenter.instance.dispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed")
+         * 当在 onDestroy 中使用 EventCenter.instance.goDispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed") 时，onDestroy 会进入两次。
+         * 解决办法。在下一帧使用 EventCenter.instance.goDispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed")
          */
         this.againReenterOnDestory();
     }
@@ -164,6 +164,6 @@ export default class joinGameInput extends cc.Component {
     async againReenterOnDestory() {
         console.log(" SomePopUIClosed  onDestroy   againReenterOnDestory");
         await waitForTime(0);
-        EventCenter.instance.dispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed")
+        EventCenter.instance.goDispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed")
     }
 }

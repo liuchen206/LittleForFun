@@ -1,0 +1,218 @@
+
+const { ccclass, property } = cc._decorator;
+export enum mjDir {
+    down = 1,
+    up,
+    left,
+    right,
+}
+
+enum mjStatus {
+    init = 'init',
+    select = 'select',
+}
+
+@ccclass
+export default class majiang extends cc.Component {
+    @property({
+        tooltip: '麻将的展示方位',
+        type: cc.Enum(mjDir)
+    })
+    public currentDir: mjDir = mjDir.down;
+    @property({
+        tooltip: '是否展示牌面',
+    })
+    public isShowed: boolean = true;
+    @property({
+        tooltip: '是否在手牌里',
+    })
+    public isInHand: boolean = true;
+    @property({
+        tooltip: '麻将id',
+    })
+    public mjId: number = 0;
+
+    @property({
+        tooltip: '屏幕下方的麻将图集',
+        type: cc.SpriteAtlas
+    })
+    public downMJAtlas: cc.SpriteAtlas = null;
+
+    @property({
+        tooltip: '屏幕上方的麻将图集',
+        type: cc.SpriteAtlas
+    })
+    public upMJAtlas: cc.SpriteAtlas = null;
+
+    @property({
+        tooltip: '屏幕左侧的麻将图集',
+        type: cc.SpriteAtlas
+    })
+    public leftMJAtlas: cc.SpriteAtlas = null;
+
+    @property({
+        tooltip: '屏幕右侧的麻将图集',
+        type: cc.SpriteAtlas
+    })
+    public rightMJAtlas: cc.SpriteAtlas = null;
+
+
+    @property({
+        tooltip: '麻将的背面图图集',
+        type: cc.SpriteAtlas
+    })
+    public backMJAtlas: cc.SpriteAtlas = null;
+    // LIFE-CYCLE CALLBACKS:
+    private currentSelectType: string = mjStatus.init;
+
+    // onLoad () {}
+
+    start() {
+        this.showMajiang();
+    }
+
+    // update (dt) {}
+    onClick() {
+        if (this.currentSelectType == mjStatus.init) {
+            // 尚且在牌堆中
+            // 在 doselect 之前，需要把其他已经select的牌设置为未选中。
+            this.node.dispatchEvent(new cc.Event.EventCustom("selectReset", true));
+            this.doSelect(true);
+        } else if (this.currentSelectType == mjStatus.select) {
+            // 点击已经被选中的牌意味着打出 这张牌
+
+        }
+    }
+    doSelect(isSelect) {
+        if (isSelect == true) {
+            this.currentSelectType = mjStatus.select;
+            this.node.y = 30;
+        } else {
+            this.currentSelectType = mjStatus.init;
+            this.node.y = 0;
+        }
+    }
+    forbitSelect(isForbit) {
+        if (isForbit == true) {
+            this.getComponent(cc.Button).interactable = false;
+        } else {
+            this.getComponent(cc.Button).interactable = true;
+        }
+    }
+
+    showMajiang(mjIndex?: number, dir?: mjDir, isShowed?: boolean, isInHand?: boolean) {
+        if (mjIndex != undefined) {
+            this.mjId = mjIndex;
+        }
+        if (dir != undefined) {
+            if (dir != this.currentDir) {
+                this.currentDir = dir;
+            }
+        }
+        if (isShowed != undefined) {
+            if (isShowed != this.isShowed) {
+                this.isShowed = isShowed;
+            }
+        }
+        if (isInHand != undefined) {
+            if (this.isInHand != isInHand) {
+                this.isInHand = isInHand;
+            }
+        }
+        let usedAtlas = null;
+        if (this.isShowed == true) {
+            if (this.currentDir == mjDir.down) {
+                // 这是自己的位置；
+                // 如果牌是在手上则是立着的。
+                // 如果牌是打出去的，则是躺着的。更屏幕上方的玩家打出的牌是一样的
+                if (this.isInHand == true) {
+                    usedAtlas = this.downMJAtlas;
+                } else {
+                    usedAtlas = this.upMJAtlas;
+                }
+            }
+            if (this.currentDir == mjDir.up) {
+                usedAtlas = this.upMJAtlas;
+            }
+            if (this.currentDir == mjDir.left) {
+                usedAtlas = this.leftMJAtlas;
+            }
+            if (this.currentDir == mjDir.right) {
+                usedAtlas = this.rightMJAtlas;
+            }
+        } else {
+            usedAtlas = this.backMJAtlas;
+        }
+
+        let sprite = this.getComponent(cc.Sprite);
+        if (this.isShowed == true) {
+            sprite.spriteFrame = usedAtlas.getSpriteFrame(this._getFrameName(this.mjId, this.currentDir));
+        } else {
+            sprite.spriteFrame = usedAtlas.getSpriteFrame(this._getBackFrameName(this.currentDir));
+        }
+    }
+    private _getBackFrameName(dir) {
+        let pre = "";
+        if (this.isInHand == false) {
+            pre = "e_mj_b_";
+        } else {
+            pre = "e_mj_";
+        }
+
+        let last = "";
+        if (dir == mjDir.down) last = "bottom";
+        if (dir == mjDir.up) last = "up";
+        if (dir == mjDir.left) last = "left";
+        if (dir == mjDir.right) last = "right";
+
+        if (this.isInHand == true && dir == mjDir.down) { // 次组合 意味着 在自己手中且是背面的状态。这个状态没有美术图片，暂时使用其他图片代替
+            pre = "e_mj_b_";
+            last = "bottom";
+        }
+        return pre + last;
+    }
+    private _getFrameName(id, dir) {
+        let pre = "";
+        if (dir == mjDir.down) pre = "M_";
+        if (dir == mjDir.up) pre = "B_";
+        if (dir == mjDir.left) pre = "L_";
+        if (dir == mjDir.right) pre = "R_";
+
+        let mid = "";
+        let index = "";
+        if (id >= 0 && id < 9) { // 筒
+            mid = "dot_";
+            index = id % 9 + 1 + '';
+        }
+        else if (id >= 9 && id < 18) { //条
+            mid = "bamboo_";
+            index = id % 9 + 1 + '';
+        }
+        else if (id >= 18 && id < 27) { //万
+            mid = "character_";
+            index = id % 9 + 1 + '';
+        }
+        else if (id == 27) { //中
+            mid = "red";
+        }
+        else if (id == 28) { //发
+            mid = "green";
+        }
+        else if (id == 29) { //白
+            mid = "white";
+        }
+        else if (id == 30) { //东
+            mid = "wind_east";
+        }
+        else if (id == 31) { //西
+            mid = "wind_west";
+        }
+        else if (id == 32) { //南
+            mid = "wind_south";
+        }
+        else if (id == 33) { //北
+            mid = "wind_north";
+        }
+        return pre + mid + index;
+    }
+}

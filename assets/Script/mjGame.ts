@@ -9,9 +9,20 @@ import players from "./majiang/players";
 import EventCenter, { EventType } from "./core_system/EventCenter";
 import DissolveUI from "./ui_component/DissolveUI";
 import { checkInit } from "./core_system/SomeRepeatThing";
+import arrow from "./majiang/arrow";
 
 const { ccclass, property } = cc._decorator;
 
+/**
+ * 无论 服务器发送多少消息。客户带内部保证如下逻辑状态。
+ * 1，等待开始
+ * 2，定缺中
+ * 3，出牌中
+ * 4，等待自己操作牌型-吃，碰，杠，胡等
+ * 5，其他玩家出牌中
+ * 6，结算
+ * 
+ */
 @ccclass
 export default class mjGame extends cc.Component {
     @property({
@@ -35,6 +46,17 @@ export default class mjGame extends cc.Component {
         tooltip: '等待投票结果界面'
     })
     waitDissolve: cc.Node = null;
+    @property({
+        type: cc.Node,
+        tooltip: '等待定缺结果界面'
+    })
+    waitDingQue: cc.Node = null;
+
+    @property({
+        type: arrow,
+        tooltip: '指示轮到谁操作的箭头控制脚本'
+    })
+    arrowTS: arrow = null;
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
@@ -46,11 +68,26 @@ export default class mjGame extends cc.Component {
         this.updateTalbleSeat();
         // majiangData.reset();
         this.updateFunctionBtns();
+        this.chectGameStatus();
         debugInfo.instance.addInfo("是否游戏开始", majiangData.isGameStart() ? "true" : "false")
         debugInfo.instance.addInfo("是否房主", majiangData.isRoomCreator() ? "true" : "false")
     }
 
     // update (dt) {}
+    /**
+     * 检查游戏状态。确定是否需要展示特定界面
+     */
+    chectGameStatus() {
+        if (majiangData.isDingQueing == true) {
+            this.waitDingQue.active = true;
+        } else {
+            this.waitDingQue.active = false;
+        }
+        if (majiangData.gamestate == "playing") {
+            this.arrowTS.setSetArrow(majiangData.getLocalIndex(majiangData.turn));
+        }
+    }
+
     onDissolveClick() {
         let title = "";
         let content = "";
@@ -103,14 +140,14 @@ export default class mjGame extends cc.Component {
     /**
      * 退出房间
      */
-    doBackToHall() {
+    private doBackToHall() {
         Net.instance.send("exit");
         // cc.director.loadScene("hall");
     }
     /**
      * 按全局保存的各个座位信息，更新ui界面
      */
-    updateTalbleSeat() {
+    private updateTalbleSeat() {
         for (let i = 0; i < majiangData.seats.length; i++) {
             let seatData = majiangData.seats[i];
             this.playersMng.updatePlayer(seatData);
@@ -119,7 +156,7 @@ export default class mjGame extends cc.Component {
     /**
      * 解散房间投票通知
      */
-    dissolveNotice() {
+    private dissolveNotice() {
         this.waitDissolve.active = true;
         let ts = this.waitDissolve.getComponent(DissolveUI);
         ts.updateDissolve();
@@ -127,15 +164,21 @@ export default class mjGame extends cc.Component {
     /**
      * 投票解散房间失败.只要一人拒绝解散则不能解散
      */
-    dissolveFailed() {
+    private dissolveFailed() {
         this.waitDissolve.active = false;
     }
-    gameOver() {
+    private gameOver() {
         PopUI.instance.showDialog("游戏结束", "退出房间",
             quickCreateEventHandler(this.node, "mjGame", "doGameOver"), null, true, "知道了");
     }
-    doGameOver() {
+    private doGameOver() {
         cc.director.loadScene("hall");
+    }
+    private game_dingque_push() {
+        this.chectGameStatus();
+    }
+    private game_dingque_finish_push() {
+        this.chectGameStatus();
     }
     /**
      * 注册麻将房的网络消息
@@ -145,11 +188,16 @@ export default class mjGame extends cc.Component {
         EventCenter.instance.AddListener(EventType.onDissolveNotice, this.dissolveNotice, this);
         EventCenter.instance.AddListener(EventType.onDissolveFailed, this.dissolveFailed, this);
         EventCenter.instance.AddListener(EventType.onGameOver, this.gameOver, this);
+        EventCenter.instance.AddListener(EventType.game_dingque_push, this.game_dingque_push, this);
+        EventCenter.instance.AddListener(EventType.game_dingque_finish_push, this.game_dingque_finish_push, this);
+
     }
     onDestroy() {
         EventCenter.instance.RemoveListener(EventType.updateMJTable, this);
         EventCenter.instance.RemoveListener(EventType.onDissolveNotice, this);
         EventCenter.instance.RemoveListener(EventType.onDissolveFailed, this);
         EventCenter.instance.RemoveListener(EventType.onGameOver, this);
+        EventCenter.instance.RemoveListener(EventType.game_dingque_push, this);
+        EventCenter.instance.RemoveListener(EventType.game_dingque_finish_push, this);
     }
 }

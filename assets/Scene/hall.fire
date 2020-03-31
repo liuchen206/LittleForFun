@@ -2098,7 +2098,7 @@
         "__id__": 56
       }
     ],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 171
@@ -2294,11 +2294,14 @@
       "__id__": 47
     },
     "_enabled": true,
-    "pressAction": 2,
+    "pressAction": 3,
     "startAction": 0,
     "delayFrameForEnterAct": 0,
     "isNeedDoRhythm": false,
     "isNeedBlock": true,
+    "hideNode": {
+      "__id__": 46
+    },
     "rootNode": {
       "__id__": 46
     },
@@ -2427,6 +2430,7 @@
     "delayFrameForEnterAct": 60,
     "isNeedDoRhythm": false,
     "isNeedBlock": false,
+    "hideNode": null,
     "rootNode": null,
     "_id": "04XkBMF89PJaWU457fqDGV"
   },
@@ -6846,6 +6850,7 @@
     "delayFrameForEnterAct": 0,
     "isNeedDoRhythm": false,
     "isNeedBlock": true,
+    "hideNode": null,
     "rootNode": null,
     "_id": "d81qvL13pA4qAowxYDdrSl"
   },

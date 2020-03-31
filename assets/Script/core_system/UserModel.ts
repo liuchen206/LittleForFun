@@ -140,14 +140,14 @@ export class UserData {
                     }, 5000);
                 }
                 else {
-                    EventCenter.instance.dispatchEvent(EventType.WaitEnd, "WaitEnd");
+                    EventCenter.instance.goDispatchEvent(EventType.WaitEnd, "WaitEnd");
                     if (callback != null) {
                         callback(ret);
                     }
                 }
             }
             else {
-                EventCenter.instance.dispatchEvent(EventType.WaitEnd, "WaitEnd");
+                EventCenter.instance.goDispatchEvent(EventType.WaitEnd, "WaitEnd");
                 if (callback != null) {
                     callback(ret);
                 }
@@ -186,9 +186,8 @@ export class MajiangData {
     isOver: boolean = false;
     huanpaimethod: any = null;
     curaction: any = null;
-
     /**
-     * 重置麻將游戲数据
+     * 重置麻將游戲数据 
      */
     reset() {
         this.turn = -1;

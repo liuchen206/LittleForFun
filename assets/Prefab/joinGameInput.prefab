@@ -27,7 +27,7 @@
         "__id__": 11
       }
     ],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 126
@@ -223,11 +223,14 @@
       "__id__": 2
     },
     "_enabled": true,
-    "pressAction": 2,
+    "pressAction": 3,
     "startAction": 0,
     "delayFrameForEnterAct": 0,
     "isNeedDoRhythm": false,
     "isNeedBlock": true,
+    "hideNode": {
+      "__id__": 1
+    },
     "rootNode": {
       "__id__": 1
     },
@@ -356,6 +359,7 @@
     "delayFrameForEnterAct": 60,
     "isNeedDoRhythm": false,
     "isNeedBlock": false,
+    "hideNode": null,
     "rootNode": null,
     "_id": ""
   },
@@ -4775,6 +4779,7 @@
     "delayFrameForEnterAct": 0,
     "isNeedDoRhythm": false,
     "isNeedBlock": true,
+    "hideNode": null,
     "rootNode": null,
     "_id": ""
   },

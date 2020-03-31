@@ -36,7 +36,7 @@ export default class PopUI extends cc.Component {
         PopUI.instance = this;
     }
     start() {
-        EventCenter.instance.AddListener(EventType.SomePopUIClosed, this.onSomePopUIClosed, this);
+        EventCenter.instance.AddListener(EventType.SomePopUIClosed, this.onSomePopUIClosed.bind(this), this);
     }
 
     // update (dt) {}

@@ -10,3 +10,17 @@ export function checkInit() {
     }
     return true;
 }
+
+export function logInfoFromServer(text: string, ...otherString: string[]) {
+    let content = text + " " + otherString.join(" ");
+    console.log('\n');
+    console.log("------NET SERVER TO CLINE-----", content);
+    console.log('\n');
+}
+
+export function logInfoFromCoreSys(text: string, ...otherString: string[]) {
+    let content = text + " " + otherString.join(" ");
+    console.log('\n');
+    console.log("##### CoreSys INFO #####", content);
+    console.log('\n');
+}

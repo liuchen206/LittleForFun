@@ -12,6 +12,7 @@ enum TouchActType {
     none = 0,
     pressAct,
     destory,
+    hide,
 }
 /**
  * 该脚本为节点预设值了若干常用的动作，比如弹出窗口动作，延时出现动作，延时消失动作，触摸Q弹动画示意点中目标动作，触摸自动销毁动作等
@@ -48,6 +49,13 @@ export default class UINodeActions extends cc.Component {
         visible: function () { return this.pressAction == TouchActType.none }
     })
     isNeedBlock: boolean = false;
+
+    @property({
+        tooltip: '当按下动作设置为隐藏节点时，可以设置一个隐藏节点。不设置默认隐藏脚本所在的节点',
+        visible: function () { return this.pressAction == TouchActType.hide },
+        type: cc.Node,
+    })
+    hideNode: cc.Node = null;
 
     @property({
         tooltip: '当按下动作设置为销毁节点时，可以设置一个销毁节点。不设置默认删除脚本所在的节点',
@@ -94,6 +102,13 @@ export default class UINodeActions extends cc.Component {
                 this.node.destroy();
             } else {
                 this.rootNode.destroy();
+            }
+        }
+        if (this.pressAction == TouchActType.hide) {
+            if (this.rootNode == null) {
+                this.node.active = false;
+            } else {
+                this.rootNode.active = false;
             }
         }
         if (this.pressAction == TouchActType.pressAct) this.doPressAction();

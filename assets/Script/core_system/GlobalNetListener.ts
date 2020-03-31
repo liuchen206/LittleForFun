@@ -5,6 +5,7 @@ import PopUI from "./PopUI";
 import { quickCreateEventHandler } from "../../tools/Tools";
 import EventCenter, { EventType } from "./EventCenter";
 import ToastUI from "./ToastUI";
+import { logInfoFromServer } from "./SomeRepeatThing";
 
 const { ccclass, property } = cc._decorator;
 
@@ -28,7 +29,7 @@ export default class GlobalNetListener extends cc.Component {
                 seats: any
             }
         }) {
-            debugInfo.instance.logInfoFromServer("login_result", JSON.stringify(data));
+            logInfoFromServer("login_result", JSON.stringify(data));
             if (data.errcode === 0) {
                 var dataInside = data.data;
                 majiangData.roomId = dataInside.roomid;
@@ -46,12 +47,12 @@ export default class GlobalNetListener extends cc.Component {
          * 注册登录麻将服完成的回调
          */
         Net.instance.addHandler("login_finished", function (data) {
-            debugInfo.instance.logInfoFromServer("login_finished", data);
+            logInfoFromServer("login_finished", data);
             cc.director.loadScene("mjgame");
         });
 
         Net.instance.addHandler("game_sync_push", function (data) {
-            debugInfo.instance.logInfoFromServer("game_sync_push == ", JSON.stringify(data));
+            logInfoFromServer("game_sync_push == ", JSON.stringify(data));
 
             majiangData.numOfMJ = data.numofmj;
             majiangData.gamestate = data.state;
@@ -83,12 +84,14 @@ export default class GlobalNetListener extends cc.Component {
                     majiangData.dingque = sd.que;
                 }
             }
+
+            EventCenter.instance.goDispatchEvent(EventType.game_holds);
         });
         /**
          * 注册房间解散的广播
          */
         Net.instance.addHandler("dispress_push", function (data) {
-            debugInfo.instance.logInfoFromServer("dispress_push ", JSON.stringify(data));
+            logInfoFromServer("dispress_push ", JSON.stringify(data));
 
             majiangData.roomId = null;
             majiangData.turn = -1;
@@ -100,7 +103,7 @@ export default class GlobalNetListener extends cc.Component {
          * 注册断开连网，服务器主动断开
          */
         Net.instance.addHandler("disconnect", function (data) {
-            debugInfo.instance.logInfoFromServer("disconnect ", JSON.stringify(data));
+            logInfoFromServer("disconnect ", JSON.stringify(data));
 
             if (majiangData.roomId == null) {
                 cc.director.loadScene("hall");
@@ -124,7 +127,7 @@ export default class GlobalNetListener extends cc.Component {
             ready: any,
             seatindex: any
         }) => {
-            debugInfo.instance.logInfoFromServer("new_user_comes_push == ", JSON.stringify(data));
+            logInfoFromServer("new_user_comes_push == ", JSON.stringify(data));
             var seatIndex = data.seatindex;
             if (majiangData.seats[seatIndex].userid > 0) {
                 majiangData.seats[seatIndex].online = true;
@@ -132,33 +135,33 @@ export default class GlobalNetListener extends cc.Component {
                 data.online = true;
                 majiangData.seats[seatIndex] = data;
             }
-            EventCenter.instance.dispatchEvent(EventType.updateMJTable);
+            EventCenter.instance.goDispatchEvent(EventType.updateMJTable);
         });
         /**
          * 注册玩家连网状态消息
          */
         Net.instance.addHandler("user_state_push", (data) => {
-            debugInfo.instance.logInfoFromServer("user_state_push == ", JSON.stringify(data));
+            logInfoFromServer("user_state_push == ", JSON.stringify(data));
             var userId = data.userid;
             var seat = majiangData.getSeatByID(userId);
             if (seat) seat.online = data.online;
-            EventCenter.instance.dispatchEvent(EventType.updateMJTable);
+            EventCenter.instance.goDispatchEvent(EventType.updateMJTable);
         });
         /**
          * 注册玩家准备完毕消息
          */
         Net.instance.addHandler("user_ready_push", (data) => {
-            debugInfo.instance.logInfoFromServer("user_ready_push == ", JSON.stringify(data));
+            logInfoFromServer("user_ready_push == ", JSON.stringify(data));
             var userId = data.userid;
             var seat = majiangData.getSeatByID(userId);
             if (seat) seat.ready = data.ready;
-            EventCenter.instance.dispatchEvent(EventType.updateMJTable);
+            EventCenter.instance.goDispatchEvent(EventType.updateMJTable);
         });
         /**
          * 注册自己退出房间的消息回调
          */
         Net.instance.addHandler("exit_result", function (data) {
-            debugInfo.instance.logInfoFromServer("exit_result == ", JSON.stringify(data));
+            logInfoFromServer("exit_result == ", JSON.stringify(data));
 
             majiangData.roomId = null;
             majiangData.turn = -1;
@@ -170,14 +173,14 @@ export default class GlobalNetListener extends cc.Component {
          * 有其他玩家离开房间
          */
         Net.instance.addHandler("exit_notify_push", (data) => {
-            debugInfo.instance.logInfoFromServer("exit_notify_push == ", JSON.stringify(data));
+            logInfoFromServer("exit_notify_push == ", JSON.stringify(data));
 
             var userId = data;
             var s = majiangData.getSeatByID(userId);
             if (s != null) {
                 s.userid = 0;
                 s.name = "";
-                EventCenter.instance.dispatchEvent(EventType.updateMJTable);
+                EventCenter.instance.goDispatchEvent(EventType.updateMJTable);
             }
         });
 
@@ -185,23 +188,23 @@ export default class GlobalNetListener extends cc.Component {
          * 注冊 通知决定是否解散房间的投票结果
          */
         Net.instance.addHandler("dissolve_notice_push", function (data) {
-            debugInfo.instance.logInfoFromServer("dissolve_notice_push == ", JSON.stringify(data));
+            logInfoFromServer("dissolve_notice_push == ", JSON.stringify(data));
             majiangData.dissoveData = data;
 
-            EventCenter.instance.dispatchEvent(EventType.onDissolveNotice);
+            EventCenter.instance.goDispatchEvent(EventType.onDissolveNotice);
         });
         /**
          * 注册 服务器判定此次房间解散失败回调
          */
         Net.instance.addHandler("dissolve_cancel_push", function (data) {
-            debugInfo.instance.logInfoFromServer("dissolve_cancel_push == ", JSON.stringify(data));
+            logInfoFromServer("dissolve_cancel_push == ", JSON.stringify(data));
             majiangData.dissoveData = null;
 
-            EventCenter.instance.dispatchEvent(EventType.onDissolveFailed);
+            EventCenter.instance.goDispatchEvent(EventType.onDissolveFailed);
         });
 
         Net.instance.addHandler("game_begin_push", function (data) {
-            debugInfo.instance.logInfoFromServer("game_begin_push == ", JSON.stringify(data));
+            logInfoFromServer("game_begin_push == ", JSON.stringify(data));
 
             majiangData.button = data;
             majiangData.turn = majiangData.button;
@@ -210,7 +213,7 @@ export default class GlobalNetListener extends cc.Component {
             // self.dispatchEvent('game_begin');
         });
         Net.instance.addHandler("game_over_push", function (data) {
-            debugInfo.instance.logInfoFromServer("game_over_push == ", JSON.stringify(data));
+            logInfoFromServer("game_over_push == ", JSON.stringify(data));
             var results = data.results;
             for (var i = 0; i < majiangData.seats.length; ++i) {
                 majiangData.seats[i].score = results.length == 0 ? 0 : results[i].totalscore;
@@ -225,17 +228,20 @@ export default class GlobalNetListener extends cc.Component {
                 // self.dispatchEvent('user_state_changed', self.seats[i]);
             }
 
-            EventCenter.instance.dispatchEvent(EventType.onGameOver);
+            EventCenter.instance.goDispatchEvent(EventType.onGameOver);
         });
         Net.instance.addHandler("game_playing_push", function (data) {
-            debugInfo.instance.logInfoFromServer("game_playing_push == ", JSON.stringify(data));
+            logInfoFromServer("game_playing_push == ", JSON.stringify(data));
 
             majiangData.gamestate = "playing";
 
             // self.dispatchEvent('game_playing');
         });
+        /**
+         *注册 手牌 更新通知
+         */
         Net.instance.addHandler("game_holds_push", function (data) {
-            debugInfo.instance.logInfoFromServer("game_holds_push == ", JSON.stringify(data));
+            logInfoFromServer("game_holds_push == ", JSON.stringify(data));
 
             var seat = majiangData.seats[majiangData.seatIndex];
             console.log(data);
@@ -260,18 +266,53 @@ export default class GlobalNetListener extends cc.Component {
                 }
                 s.ready = false;
             }
-            // self.dispatchEvent('game_holds');
+
+            EventCenter.instance.goDispatchEvent(EventType.game_holds);
         });
         Net.instance.addHandler("game_num_push", function (data) {
-            debugInfo.instance.logInfoFromServer("game_num_push == ", JSON.stringify(data));
+            logInfoFromServer("game_num_push == ", JSON.stringify(data));
             majiangData.numOfGames = data;
             // self.dispatchEvent('game_num', data);
         });
         Net.instance.addHandler("mj_count_push", function (data) {
-            debugInfo.instance.logInfoFromServer("mj_count_push == ", JSON.stringify(data));
+            logInfoFromServer("mj_count_push == ", JSON.stringify(data));
 
             majiangData.numOfMJ = data;
             // self.dispatchEvent('mj_count', data);
+        });
+
+        /**
+         * 注册 有玩家完成定缺 通知
+         */
+        Net.instance.addHandler("game_dingque_notify_push", function (data) {
+            logInfoFromServer("game_dingque_notify_push == ", JSON.stringify(data));
+
+            EventCenter.instance.goDispatchEvent(EventType.game_dingque_notify_push, data);
+        });
+        /**
+         * 注册 所有玩家定缺完成 通知
+         */
+        Net.instance.addHandler("game_dingque_finish_push", function (data) {
+            logInfoFromServer("game_dingque_finish_push == ", JSON.stringify(data));
+            majiangData.isDingQueing = false;
+
+            for (var i = 0; i < data.length; ++i) {
+                majiangData.seats[i].dingque = data[i];
+            }
+
+            EventCenter.instance.goDispatchEvent(EventType.game_dingque_finish_push, data);
+
+        });
+        /**
+         * 注册 发起定缺开始 通知
+         */
+        Net.instance.addHandler("game_dingque_push", function (data) {
+            logInfoFromServer("game_dingque_push == ", JSON.stringify(data));
+
+            majiangData.isDingQueing = true;
+            majiangData.isHuanSanZhang = false;
+
+            EventCenter.instance.goDispatchEvent(EventType.game_dingque_push, data);
         });
     }
 

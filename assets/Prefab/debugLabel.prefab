@@ -21,17 +21,20 @@
     "_components": [
       {
         "__id__": 2
+      },
+      {
+        "__id__": 3
       }
     ],
     "_prefab": {
-      "__id__": 3
+      "__id__": 4
     },
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 0,
-      "g": 0,
-      "b": 0,
+      "r": 255,
+      "g": 255,
+      "b": 255,
       "a": 255
     },
     "_contentSize": {
@@ -103,6 +106,23 @@
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 0,
+    "_id": ""
+  },
+  {
+    "__type__": "a35b0phtnxML4ffsu58S5jN",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "pressAction": 2,
+    "startAction": 0,
+    "delayFrameForEnterAct": 0,
+    "isNeedDoRhythm": false,
+    "isNeedBlock": false,
+    "hideNode": null,
+    "rootNode": null,
     "_id": ""
   },
   {

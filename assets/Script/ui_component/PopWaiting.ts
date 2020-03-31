@@ -37,10 +37,12 @@ export default class PopWaiting extends cc.Component {
         }
         /**
          * 我无法理解的领域
-         * 当在 onDestroy 中使用 EventCenter.instance.dispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed") 时，onDestroy 会进入两次。
-         * 解决办法。在下一帧使用 EventCenter.instance.dispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed")
+         * 当在 onDestroy 中使用 EventCenter.instance.goDispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed") 时，onDestroy 会进入两次。
+         * 解决办法。在下一帧使用 EventCenter.instance.goDispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed")
          */
-        this.againReenterOnDestory();
+        if (this.node.activeInHierarchy) {
+            this.againReenterOnDestory();
+        }
     }
     /**
      * 只为延时一帧执行
@@ -48,7 +50,7 @@ export default class PopWaiting extends cc.Component {
     async againReenterOnDestory() {
         console.log(" SomePopUIClosed  onDestroy   againReenterOnDestory");
         await waitForTime(0);
-        EventCenter.instance.dispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed")
+        EventCenter.instance.goDispatchEvent(EventType.SomePopUIClosed, "dispatchEvent SomePopUIClosed")
     }
     /**
      * 
@@ -75,7 +77,7 @@ export default class PopWaiting extends cc.Component {
      */
     onClickTest() {
         if (this.eventTypeSet) {
-            EventCenter.instance.dispatchEvent(EventType.TEST_EVENT, "none");
+            EventCenter.instance.goDispatchEvent(EventType.TEST_EVENT, "none");
         } else {
             this.node.destroy();
         }
