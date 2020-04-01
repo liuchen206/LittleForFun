@@ -19,24 +19,29 @@ export default class NodeGlobalManager extends cc.Component {
 
     async start() {
         // 顺便做下测试
-        EventCenter.instance.AddListener(EventType.TEST_EVENT, (d) => {
-            console.log('aaa', EventType.TEST_EVENT, d);
-        }, this)
+        // EventCenter.instance.AddListener(EventType.TEST_EVENT, (d) => {
+        //     console.log('aaa', EventType.TEST_EVENT, d);
+        // }, this)
 
-        EventCenter.instance.goDispatchEvent(EventType.TEST_EVENT, 123);
-        EventCenter.instance.goDispatchEvent(EventType.TEST_EVENT, 456);
-        EventCenter.instance.RemoveListener(EventType.TEST_EVENT, this);
-        EventCenter.instance.goDispatchEvent(EventType.TEST_EVENT, 789);
+        // EventCenter.instance.goDispatchEvent(EventType.TEST_EVENT, 123);
+        // EventCenter.instance.goDispatchEvent(EventType.TEST_EVENT, 456);
+        // EventCenter.instance.RemoveListener(EventType.TEST_EVENT, this);
+        // EventCenter.instance.goDispatchEvent(EventType.TEST_EVENT, 789);
+        // EventCenter.instance.AddListener(EventType.TEST_EVENT, (d) => {
+        //     console.log('TEST_EVENT call ', EventType.TEST_EVENT, d);
+        // }, this)
+        // EventCenter.instance.goDispatchEvent(EventType.TEST_EVENT, 'aaa');
+        // EventCenter.instance.goDispatchEvent(EventType.TEST_EVENT, 'bbb');
 
-        console.log("所有异步操作 开始", dateFormat('HH:mm:ss:ff'));
+        // console.log("所有异步操作 开始", dateFormat('HH:mm:ss:ff'));
 
-        await this.doAsyncA().then((data) => {
-            console.log("doAsyncA , 成功", dateFormat('HH:mm:ss:ff'), "返回data = ", data);
-        }).catch((data) => {
-            console.log("doAsyncA , 失败", dateFormat('HH:mm:ss:ff'), "返回data = ", data);
-        });
+        // await this.doAsyncA().then((data) => {
+        //     console.log("doAsyncA , 成功", dateFormat('HH:mm:ss:ff'), "返回data = ", data);
+        // }).catch((data) => {
+        //     console.log("doAsyncA , 失败", dateFormat('HH:mm:ss:ff'), "返回data = ", data);
+        // });
 
-        console.log("所有异步操作 完成", dateFormat('HH:mm:ss:ff'));
+        // console.log("所有异步操作 完成", dateFormat('HH:mm:ss:ff'));
     }
 
     // update (dt) {}

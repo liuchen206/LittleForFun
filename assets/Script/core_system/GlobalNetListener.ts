@@ -230,12 +230,15 @@ export default class GlobalNetListener extends cc.Component {
 
             EventCenter.instance.goDispatchEvent(EventType.onGameOver);
         });
+        /**
+         * 注册 对局开始通知
+         */
         Net.instance.addHandler("game_playing_push", function (data) {
             logInfoFromServer("game_playing_push == ", JSON.stringify(data));
 
             majiangData.gamestate = "playing";
 
-            // self.dispatchEvent('game_playing');
+            EventCenter.instance.goDispatchEvent(EventType.game_playing_push);
         });
         /**
          *注册 手牌 更新通知
@@ -313,6 +316,31 @@ export default class GlobalNetListener extends cc.Component {
             majiangData.isHuanSanZhang = false;
 
             EventCenter.instance.goDispatchEvent(EventType.game_dingque_push, data);
+        });
+        /**
+         * 注册 通知该谁出牌了
+         */
+        Net.instance.addHandler("game_chupai_push", function (data) {
+            logInfoFromServer("game_chupai_push == ", JSON.stringify(data));
+
+            var turnUserID = data;
+            majiangData.turn = majiangData.getSeatIndexByID(turnUserID);
+
+            EventCenter.instance.goDispatchEvent(EventType.game_chupai_push);
+        });
+        /**
+         * 注册 有人打出了一张牌
+         */
+        Net.instance.addHandler("game_chupai_notify_push", function (data) {
+            logInfoFromServer("game_chupai_notify_push == ", JSON.stringify(data));
+            var userId = data.userId; // 谁
+            var paiIndex = data.pai; // 牌型
+            EventCenter.instance.goDispatchEvent(EventType.game_chupai_notify_push, { 'userId': userId, 'paiIndex': paiIndex });
+        });
+        Net.instance.addHandler("game_mopai_push", function (data) {
+            logInfoFromServer("game_mopai_push == ", JSON.stringify(data));
+
+            EventCenter.instance.goDispatchEvent(EventType.game_mopai_push, data);
         });
     }
 

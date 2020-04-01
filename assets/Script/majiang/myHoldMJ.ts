@@ -1,6 +1,8 @@
 import EventCenter, { EventType } from "../core_system/EventCenter";
 import { majiangData, userData } from "../core_system/UserModel";
 import majiang, { mjDir } from "./majiang";
+import mjGame from "../mjGame";
+import { logInfoForCatchEye } from "../core_system/SomeRepeatThing";
 
 const { ccclass, property } = cc._decorator;
 
@@ -35,11 +37,57 @@ export default class myHoldMJ extends cc.Component {
                 mjTS.doSelect(false);
             }
         })
+        this.node.on("reorder", () => {
+            console.log("reorder");
+            this.onGameHolds();
+        })
+
+
     }
     onDestroy() {
         EventCenter.instance.RemoveListener(EventType.game_holds, this);
     }
 
+    /**
+     * 按id删除一个麻将手牌
+     * @param index 待删除的麻将id
+     */
+    deleteIndex(index) {
+        let alreandyShows = this.node.getComponentsInChildren(majiang);
+        let isBingo = false;
+        for (let i = 0; i < alreandyShows.length; i++) {
+            let mjTS = alreandyShows[i];
+            if (mjTS.mjId == index) {
+                mjTS.node.destroy();
+                isBingo = true;
+                break;
+            }
+        }
+        if (isBingo == false) {
+            logInfoForCatchEye("准备删除手牌", index, "但是在持有的手牌中没有找到该牌");
+        }
+    }
+    /**
+     * 向手牌中添加一张牌
+     * @param index 服务器定义的麻将索引
+     */
+    addIndex(index) {
+        let newMJ = cc.instantiate(this.mjPrefab);
+        let mjTS = newMJ.getComponent(majiang);
+        mjTS.showMajiang(index, mjDir.down, true, true);
+        this.node.addChild(newMJ);
+
+        var s = majiangData.getSeatByID(userData.userId);
+        if (s != null) {
+            if (s.holds != null) {
+                s.holds.push(index);
+            }
+        }
+    }
+
+    /**
+     * 更新自己的手牌
+     */
     onGameHolds() {
         var s = majiangData.getSeatByID(userData.userId);
         if (s != null) {
@@ -50,17 +98,22 @@ export default class myHoldMJ extends cc.Component {
             if (holds.length > 1) {
                 this.sortMJ(holds);
             }
+            let alreandyShows = this.node.getComponentsInChildren(majiang);
             for (let i = 0; i < holds.length; i++) {
                 let mj = holds[i];
-                let alreandyShow = this.node.getComponentsInChildren(majiang);
-                if (alreandyShow.length > i) {
-                    alreandyShow[i].showMajiang(mj, mjDir.down, true, true);
+                if (alreandyShows.length > i) {
+                    alreandyShows[i].showMajiang(mj, mjDir.down, true, true);
                 } else {
                     let newMJ = cc.instantiate(this.mjPrefab);
                     let mjTS = newMJ.getComponent(majiang);
                     mjTS.showMajiang(mj, mjDir.down, true, true);
                     this.node.addChild(newMJ);
                 }
+            }
+            let i = alreandyShows.length;
+            while (i > holds.length) {
+                i--;
+                alreandyShows[i].node.destroy()
             }
         }
     }

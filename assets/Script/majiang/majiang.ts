@@ -1,3 +1,7 @@
+import Net from "../core_system/Net";
+import { majiangData } from "../core_system/UserModel";
+import toastText from "../ui_component/toastText";
+import ToastUI from "../core_system/ToastUI";
 
 const { ccclass, property } = cc._decorator;
 export enum mjDir {
@@ -68,11 +72,17 @@ export default class majiang extends cc.Component {
     // onLoad () {}
 
     start() {
-        this.showMajiang();
+        // this.showMajiang();
     }
 
     // update (dt) {}
     onClick() {
+        //如果不是自己出牌，则禁止点击牌
+        if (majiangData.turn != majiangData.seatIndex) {
+            ToastUI.instance.showToast("尚未轮到我出牌");
+            this.node.dispatchEvent(new cc.Event.EventCustom("selectReset", true));
+            return;
+        }
         if (this.currentSelectType == mjStatus.init) {
             // 尚且在牌堆中
             // 在 doselect 之前，需要把其他已经select的牌设置为未选中。
@@ -80,9 +90,15 @@ export default class majiang extends cc.Component {
             this.doSelect(true);
         } else if (this.currentSelectType == mjStatus.select) {
             // 点击已经被选中的牌意味着打出 这张牌
-
+            Net.instance.send('chupai', this.mjId);
+            this.node.dispatchEvent(new cc.Event.EventCustom("selectReset", true));
+            this.node.dispatchEvent(new cc.Event.EventCustom("reorder", true));
         }
     }
+    /**
+     * 设置牌是否被选中了。选中后会高出其他牌
+     * @param isSelect 是否选中
+     */
     doSelect(isSelect) {
         if (isSelect == true) {
             this.currentSelectType = mjStatus.select;
@@ -92,6 +108,10 @@ export default class majiang extends cc.Component {
             this.node.y = 0;
         }
     }
+    /**
+     * 设置牌是否允许被选中
+     * @param isForbit 是否禁止选中
+     */
     forbitSelect(isForbit) {
         if (isForbit == true) {
             this.getComponent(cc.Button).interactable = false;
@@ -100,8 +120,15 @@ export default class majiang extends cc.Component {
         }
     }
 
+    /**
+     * 设置牌的展示样式 
+     * @param mjIndex 牌的索引
+     * @param dir 展示的方向
+     * @param isShowed 是否展示牌面
+     * @param isInHand 是否在手牌中
+     */
     showMajiang(mjIndex?: number, dir?: mjDir, isShowed?: boolean, isInHand?: boolean) {
-        if (mjIndex != undefined) {
+        if (mjIndex != undefined) { // 如果不传牌型的索引。则认为不会展示该牌
             this.mjId = mjIndex;
         }
         if (dir != undefined) {
@@ -151,6 +178,10 @@ export default class majiang extends cc.Component {
             sprite.spriteFrame = usedAtlas.getSpriteFrame(this._getBackFrameName(this.currentDir));
         }
     }
+    /**
+     * 通过展示的方向返回一个牌面的图片
+     * @param dir 展示的方向
+     */
     private _getBackFrameName(dir) {
         let pre = "";
         if (this.isInHand == false) {
@@ -171,10 +202,20 @@ export default class majiang extends cc.Component {
         }
         return pre + last;
     }
+    /**
+     * 按牌的方向和索引返回对应的图片
+     * @param id 牌的索引
+     * @param dir 展示的方向
+     */
     private _getFrameName(id, dir) {
         let pre = "";
-        if (dir == mjDir.down) pre = "M_";
-        if (dir == mjDir.up) pre = "B_";
+        if (this.isInHand == true) {
+            if (dir == mjDir.down) pre = "M_";
+            if (dir == mjDir.up) pre = "B_";
+        } else {
+            if (dir == mjDir.up) pre = "B_";
+            if (dir == mjDir.down) pre = "B_";
+        }
         if (dir == mjDir.left) pre = "L_";
         if (dir == mjDir.right) pre = "R_";
 

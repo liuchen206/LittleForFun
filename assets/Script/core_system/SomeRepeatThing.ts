@@ -11,6 +11,11 @@ export function checkInit() {
     return true;
 }
 
+/**
+ * 在控制台大印来自网络消息通讯的日志
+ * @param text 提示文字
+ * @param otherString 提示文字
+ */
 export function logInfoFromServer(text: string, ...otherString: string[]) {
     let content = text + " " + otherString.join(" ");
     console.log('\n');
@@ -18,9 +23,26 @@ export function logInfoFromServer(text: string, ...otherString: string[]) {
     console.log('\n');
 }
 
+/**
+ * 在控制台大印来自客戶端本地系統級的日志, 比如：本地的消息系统的日志信息
+ * @param text 提示文字
+ * @param otherString 提示文字
+ */
 export function logInfoFromCoreSys(text: string, ...otherString: string[]) {
     let content = text + " " + otherString.join(" ");
     console.log('\n');
     console.log("##### CoreSys INFO #####", content);
+    console.log('\n');
+}
+
+/**
+ * 在控制台大印来自客戶端本地 需要醒目提示的信息。
+ * @param text 提示文字
+ * @param otherString 提示文字
+ */
+export function logInfoForCatchEye(text: string, ...otherString: string[]) {
+    let content = text + " " + otherString.join(" ");
+    console.log('\n');
+    console.log("!!!!!!! CatchEye INFO !!!!!!!", content);
     console.log('\n');
 }

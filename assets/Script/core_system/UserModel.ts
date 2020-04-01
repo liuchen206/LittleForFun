@@ -254,10 +254,11 @@ export class MajiangData {
         return true;
     }
     /**
-     * 我自己是否是房主
+     * 是不是我自己
+     * @param testUserID 测试的玩家id
      */
-    isRoomCreator() {
-        if (userData.userId == this.conf.creator) return true;
+    isMySelf(testUserID) {
+        if (testUserID == userData.userId) return true;
         return false;
     }
     /**

@@ -10,6 +10,8 @@ import EventCenter, { EventType } from "./core_system/EventCenter";
 import DissolveUI from "./ui_component/DissolveUI";
 import { checkInit } from "./core_system/SomeRepeatThing";
 import arrow from "./majiang/arrow";
+import myHoldMJ from "./majiang/myHoldMJ";
+import myFold from "./majiang/myFold";
 
 const { ccclass, property } = cc._decorator;
 
@@ -57,6 +59,17 @@ export default class mjGame extends cc.Component {
         tooltip: '指示轮到谁操作的箭头控制脚本'
     })
     arrowTS: arrow = null;
+
+    @property({
+        type: myHoldMJ,
+        tooltip: '我自己的手牌的控制脚本'
+    })
+    myHoldMJ_TS: myHoldMJ = null;
+    @property({
+        type: myFold,
+        tooltip: '我自己的出牌展示的控制脚本'
+    })
+    myFoldMJ_TS: myFold = null;
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
@@ -70,7 +83,7 @@ export default class mjGame extends cc.Component {
         this.updateFunctionBtns();
         this.chectGameStatus();
         debugInfo.instance.addInfo("是否游戏开始", majiangData.isGameStart() ? "true" : "false")
-        debugInfo.instance.addInfo("是否房主", majiangData.isRoomCreator() ? "true" : "false")
+        debugInfo.instance.addInfo("是否房主", majiangData.isMySelf(majiangData.conf.creator) ? "true" : "false")
     }
 
     // update (dt) {}
@@ -112,7 +125,7 @@ export default class mjGame extends cc.Component {
      */
     updateFunctionBtns() {
         if (majiangData.isGameStart() == false) {
-            if (majiangData.isRoomCreator() == true) {
+            if (majiangData.isMySelf(majiangData.conf.creator) == true) { // 我自己是不是房主
                 this.btnDissolve.active = true;
                 this.btnExit.active = false;
             } else {
@@ -180,6 +193,29 @@ export default class mjGame extends cc.Component {
     private game_dingque_finish_push() {
         this.chectGameStatus();
     }
+    private game_playing_push() {
+        this.chectGameStatus();
+    }
+    private game_chupai_push() {
+        this.chectGameStatus();
+    }
+    private game_chupai_notify_push(data) {
+        console.log('game_chupai_notify_push', JSON.stringify(data));
+        this.chectGameStatus();
+
+        // 更新桌上的牌
+        let userid = data.userId;
+        let paiIndex = data.paiIndex;
+        if (majiangData.isMySelf(userid)) { // 是自己出牌就更新自己的手牌和出牌展示
+            this.myHoldMJ_TS.deleteIndex(paiIndex);
+            this.myFoldMJ_TS.addIndex(paiIndex);
+        }
+    }
+    private game_mopai_push(data) {
+        console.log('game_mopai_push', JSON.stringify(data));
+        this.chectGameStatus();
+        this.myHoldMJ_TS.addIndex(data);
+    }
     /**
      * 注册麻将房的网络消息
      */
@@ -190,6 +226,11 @@ export default class mjGame extends cc.Component {
         EventCenter.instance.AddListener(EventType.onGameOver, this.gameOver, this);
         EventCenter.instance.AddListener(EventType.game_dingque_push, this.game_dingque_push, this);
         EventCenter.instance.AddListener(EventType.game_dingque_finish_push, this.game_dingque_finish_push, this);
+        EventCenter.instance.AddListener(EventType.game_playing_push, this.game_playing_push, this);
+        EventCenter.instance.AddListener(EventType.game_chupai_push, this.game_chupai_push, this);
+        EventCenter.instance.AddListener(EventType.game_chupai_notify_push, this.game_chupai_notify_push, this);
+        EventCenter.instance.AddListener(EventType.game_mopai_push, this.game_mopai_push, this);
+
 
     }
     onDestroy() {
@@ -199,5 +240,9 @@ export default class mjGame extends cc.Component {
         EventCenter.instance.RemoveListener(EventType.onGameOver, this);
         EventCenter.instance.RemoveListener(EventType.game_dingque_push, this);
         EventCenter.instance.RemoveListener(EventType.game_dingque_finish_push, this);
+        EventCenter.instance.RemoveListener(EventType.game_playing_push, this);
+        EventCenter.instance.RemoveListener(EventType.game_chupai_push, this);
+        EventCenter.instance.RemoveListener(EventType.game_chupai_notify_push, this);
+        EventCenter.instance.RemoveListener(EventType.game_mopai_push, this);
     }
 }
