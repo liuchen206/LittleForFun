@@ -214,13 +214,41 @@ export class MajiangData {
         }
     }
     /**
+     * 通过本地座位号，返回服务端座位号; 以求在座位数组中找到对应的数据
+     * @param localIndex 本地座位号
+     */
+    getServerIndex(localIndex) {
+        let ret = (this.seatIndex + localIndex) % 4;
+        return ret;
+    }
+    /**
      * 将服务器的座位号，转换为本地ui上的节点索引。
-     * 因为在客户端界面自己总是显示在下方的座位上，无论服务器给自己分配的座位号是多少，只保证上下家关系一直即可
+     * 因为在客户端界面自己总是显示在下方的座位上，无论服务器给自己分配的座位号是多少，只保证上下家关系一致即可
      * @param index 服务器座位号
      */
     getLocalIndex(index) {
         var ret = (index - this.seatIndex + 4) % 4;
         return ret;
+    }
+    /**
+     * 将玩家id，转换为客户端本地座位号
+     * @param userId 玩家id
+     */
+    getLocalIndexByUserId(userId) {
+        let serIndex = this.getSeatIndexByID(userId);
+        let localIndex = this.getLocalIndex(serIndex);
+        return localIndex;
+    }
+    /**
+     * 通过本地座位号，返回该座位对应的座位数据
+     * @param localIndex 客户端本地座位号
+     */
+    getSeatByLocalIndex(localIndex) {
+        let serIndex = this.getServerIndex(localIndex);
+        if (serIndex >= 0 && serIndex <= 3) {
+            return this.seats[serIndex];
+        }
+        return null;
     }
     /**
      * 通过玩家的id返回自己的座位信息

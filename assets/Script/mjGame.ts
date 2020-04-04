@@ -8,10 +8,11 @@ import debugInfo from "./core_system/debugInfo";
 import players from "./majiang/players";
 import EventCenter, { EventType } from "./core_system/EventCenter";
 import DissolveUI from "./ui_component/DissolveUI";
-import { checkInit } from "./core_system/SomeRepeatThing";
+import { checkInit, convertLocalIndexToMJDir, logInfoForCatchEye } from "./core_system/SomeRepeatThing";
 import arrow from "./majiang/arrow";
-import myHoldMJ from "./majiang/myHoldMJ";
-import myFold from "./majiang/myFold";
+import holdsMJ from "./majiang/holdsMJ";
+import foldsMJ from "./majiang/foldsMJ";
+import { mjDir } from "./majiang/majiang";
 
 const { ccclass, property } = cc._decorator;
 
@@ -61,15 +62,33 @@ export default class mjGame extends cc.Component {
     arrowTS: arrow = null;
 
     @property({
-        type: myHoldMJ,
+        type: holdsMJ,
         tooltip: '我自己的手牌的控制脚本'
     })
-    myHoldMJ_TS: myHoldMJ = null;
+    myHoldMJ_TS: holdsMJ = null;
     @property({
-        type: myFold,
+        type: foldsMJ,
         tooltip: '我自己的出牌展示的控制脚本'
     })
-    myFoldMJ_TS: myFold = null;
+    myFoldMJ_TS: foldsMJ = null;
+
+    @property({
+        type: foldsMJ,
+        tooltip: '我自己左侧（上家）的出牌展示的控制脚本'
+    })
+    leftFoldMJ_TS: foldsMJ = null;
+
+    @property({
+        type: foldsMJ,
+        tooltip: '我自己右侧（下家）的出牌展示的控制脚本'
+    })
+    rightFoldMJ_TS: foldsMJ = null;
+
+    @property({
+        type: foldsMJ,
+        tooltip: '我自己上方（对家）的出牌展示的控制脚本'
+    })
+    upFoldMJ_TS: foldsMJ = null;
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
@@ -209,6 +228,15 @@ export default class mjGame extends cc.Component {
         if (majiangData.isMySelf(userid)) { // 是自己出牌就更新自己的手牌和出牌展示
             this.myHoldMJ_TS.deleteIndex(paiIndex);
             this.myFoldMJ_TS.addIndex(paiIndex);
+        } else {
+            // 是别人出牌，更新对应的出牌池
+            let localIndex = majiangData.getLocalIndexByUserId(userid); // 获得客户都座位号
+            // 通过userid知道自己的座位方向
+            let dir = convertLocalIndexToMJDir(localIndex);
+            logInfoForCatchEye("其他人出牌了 出牌方位", mjDir[dir] + ' ', localIndex + '本地座位号');
+            if (dir == mjDir.left) this.leftFoldMJ_TS.addIndex(paiIndex);
+            if (dir == mjDir.right) this.rightFoldMJ_TS.addIndex(paiIndex);
+            if (dir == mjDir.up) this.upFoldMJ_TS.addIndex(paiIndex);
         }
     }
     private game_mopai_push(data) {

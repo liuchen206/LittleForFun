@@ -5,7 +5,7 @@ import ToastUI from "../core_system/ToastUI";
 
 const { ccclass, property } = cc._decorator;
 export enum mjDir {
-    down = 1,
+    down = 0,
     up,
     left,
     right,

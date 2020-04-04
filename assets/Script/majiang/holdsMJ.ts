@@ -7,7 +7,7 @@ import { logInfoForCatchEye } from "../core_system/SomeRepeatThing";
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class myHoldMJ extends cc.Component {
+export default class holdsMJ extends cc.Component {
     @property({
         type: cc.Prefab,
         tooltip: "单个麻将预制体"
@@ -90,7 +90,7 @@ export default class myHoldMJ extends cc.Component {
      */
     onGameHolds() {
         var s = majiangData.getSeatByID(userData.userId);
-        if (s != null) {
+        if (s != null && s.holds) {
             console.log("我的手牌", JSON.stringify(s.holds));
             let holds: number[] = s.holds;
             if (!holds) return; // 可能进入房间时，没有手牌
@@ -115,8 +115,14 @@ export default class myHoldMJ extends cc.Component {
                 i--;
                 alreandyShows[i].node.destroy()
             }
+        } else {
+            this.node.removeAllChildren();
         }
     }
+    /**
+     * 按从低到高排列麻将索引数组-即：筒-条-万
+     * @param mahjongs 麻将索引数组
+     */
     sortMJ(mahjongs) {
         mahjongs.sort(function (a, b) {
             return a - b;
