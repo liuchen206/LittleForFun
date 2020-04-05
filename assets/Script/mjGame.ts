@@ -13,6 +13,7 @@ import arrow from "./majiang/arrow";
 import holdsMJ from "./majiang/holdsMJ";
 import foldsMJ from "./majiang/foldsMJ";
 import { mjDir } from "./majiang/majiang";
+import otherHold from "./majiang/otherHold";
 
 const { ccclass, property } = cc._decorator;
 
@@ -89,6 +90,22 @@ export default class mjGame extends cc.Component {
         tooltip: '我自己上方（对家）的出牌展示的控制脚本'
     })
     upFoldMJ_TS: foldsMJ = null;
+
+    @property({
+        type: otherHold,
+        tooltip: '我自己上方（对家）的手牌展示的控制脚本'
+    })
+    upHoldMJ_TS: otherHold = null;
+    @property({
+        type: otherHold,
+        tooltip: '我自己左侧（上家）的手牌展示的控制脚本'
+    })
+    leftHoldMJ_TS: otherHold = null;
+    @property({
+        type: otherHold,
+        tooltip: '我自己右侧（下家）的手牌展示的控制脚本'
+    })
+    rightHoldMJ_TS: otherHold = null;
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
@@ -214,8 +231,17 @@ export default class mjGame extends cc.Component {
     }
     private game_playing_push() {
         this.chectGameStatus();
+        this.updateFunctionBtns();
     }
     private game_chupai_push() {
+        // 给其他玩家添加手牌
+        let localIndex = majiangData.getLocalIndex(majiangData.turn);
+        let dir = convertLocalIndexToMJDir(localIndex);
+        //if (dir == 0) nothing here; 是我自己我自己,由专门的holdsMJ脚本控制自己的手牌展示.这里只管理其他玩家。因为其他玩家的牌都是背着的。与自己的手牌不同，所以同意管理
+        if (dir == mjDir.right) this.rightHoldMJ_TS.addIndex();
+        if (dir == mjDir.up) this.upHoldMJ_TS.addIndex();
+        if (dir == mjDir.left) this.leftHoldMJ_TS.addIndex();
+
         this.chectGameStatus();
     }
     private game_chupai_notify_push(data) {
@@ -237,6 +263,10 @@ export default class mjGame extends cc.Component {
             if (dir == mjDir.left) this.leftFoldMJ_TS.addIndex(paiIndex);
             if (dir == mjDir.right) this.rightFoldMJ_TS.addIndex(paiIndex);
             if (dir == mjDir.up) this.upFoldMJ_TS.addIndex(paiIndex);
+
+            if (dir == mjDir.right) this.rightHoldMJ_TS.deleteOne();
+            if (dir == mjDir.up) this.upHoldMJ_TS.deleteOne();
+            if (dir == mjDir.left) this.leftHoldMJ_TS.deleteOne();
         }
     }
     private game_mopai_push(data) {

@@ -5,6 +5,9 @@ import { convertDirToLocalIndex, logInfoForCatchEye } from "../core_system/SomeR
 
 const { ccclass, property } = cc._decorator;
 
+/**
+ * 所有出牌牌池的控制脚本
+ */
 @ccclass
 export default class foldsMJ extends cc.Component {
     @property({
@@ -38,6 +41,7 @@ export default class foldsMJ extends cc.Component {
 
         let newMJ = cc.instantiate(this.mjPrefab);
         let mjTS = newMJ.getComponent(majiang);
+        mjTS.forbitSelect(true, false);
         mjTS.showMajiang(index, this.showMJDir, true, false);
         this.node.addChild(newMJ);
     }
@@ -48,7 +52,6 @@ export default class foldsMJ extends cc.Component {
         let localIndex = convertDirToLocalIndex(this.showMJDir);
         let seatData = majiangData.getSeatByLocalIndex(localIndex);
         logInfoForCatchEye("尝试获取牌池信息", localIndex + '___', JSON.stringify(seatData), '___' + mjDir[this.showMJDir]);
-        // var seatData = majiangData.getSeatByID(userData.userId);
         if (seatData != null && seatData.folds) {
             console.log("牌池更新", JSON.stringify(seatData.folds));
             let folds: number[] = seatData.folds;
@@ -59,9 +62,11 @@ export default class foldsMJ extends cc.Component {
                 let mj = folds[i];
                 if (alreandyShows.length > i) {
                     alreandyShows[i].showMajiang(mj, this.showMJDir, true, false);
+                    alreandyShows[i].forbitSelect(true, false);
                 } else {
                     let newMJ = cc.instantiate(this.mjPrefab);
                     let mjTS = newMJ.getComponent(majiang);
+                    mjTS.forbitSelect(true, false);
                     mjTS.showMajiang(mj, this.showMJDir, true, false);
                     this.node.addChild(newMJ);
                 }

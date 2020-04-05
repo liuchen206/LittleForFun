@@ -6,6 +6,9 @@ import { logInfoForCatchEye } from "../core_system/SomeRepeatThing";
 
 const { ccclass, property } = cc._decorator;
 
+/**
+ * 自己手牌的控制脚本
+ */
 @ccclass
 export default class holdsMJ extends cc.Component {
     @property({

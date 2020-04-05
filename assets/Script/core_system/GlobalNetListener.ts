@@ -329,7 +329,7 @@ export default class GlobalNetListener extends cc.Component {
             EventCenter.instance.goDispatchEvent(EventType.game_chupai_push);
         });
         /**
-         * 注册 有人打出了一张牌
+         * 注册 有人打出了一张牌通知
          */
         Net.instance.addHandler("game_chupai_notify_push", function (data) {
             logInfoFromServer("game_chupai_notify_push == ", JSON.stringify(data));
@@ -337,6 +337,9 @@ export default class GlobalNetListener extends cc.Component {
             var paiIndex = data.pai; // 牌型
             EventCenter.instance.goDispatchEvent(EventType.game_chupai_notify_push, { 'userId': userId, 'paiIndex': paiIndex });
         });
+        /**
+         * 注册 我自己摸牌通知
+         */
         Net.instance.addHandler("game_mopai_push", function (data) {
             logInfoFromServer("game_mopai_push == ", JSON.stringify(data));
 

@@ -16,6 +16,9 @@ enum mjStatus {
     select = 'select',
 }
 
+/**
+ * 单个麻将牌的所有形式的控制脚本
+ */
 @ccclass
 export default class majiang extends cc.Component {
     @property({
@@ -111,8 +114,11 @@ export default class majiang extends cc.Component {
     /**
      * 设置牌是否允许被选中
      * @param isForbit 是否禁止选中
+     * @param isenableAutoGray 是否禁止选中后自动变灰功能
+     * 
      */
-    forbitSelect(isForbit) {
+    forbitSelect(isForbit, isenableAutoGray?: boolean) {
+        if (isenableAutoGray != undefined) this.getComponent(cc.Button).enableAutoGrayEffect = isenableAutoGray;
         if (isForbit == true) {
             this.getComponent(cc.Button).interactable = false;
         } else {
