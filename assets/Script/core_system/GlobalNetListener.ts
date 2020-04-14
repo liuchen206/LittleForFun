@@ -1,11 +1,11 @@
 import Net from "./Net";
-import { majiangData, userData } from "./UserModel";
+import { majiangData, userData, runningGameData } from "./UserModel";
 import debugInfo from "./debugInfo";
 import PopUI from "./PopUI";
 import { quickCreateEventHandler } from "../../tools/Tools";
 import EventCenter, { EventType } from "./EventCenter";
 import ToastUI from "./ToastUI";
-import { logInfoFromServer } from "./SomeRepeatThing";
+import { logInfoFromServer, logInfoForCatchEye } from "./SomeRepeatThing";
 
 const { ccclass, property } = cc._decorator;
 
@@ -19,26 +19,30 @@ export default class GlobalNetListener extends cc.Component {
         /**
          * 注册登录麻将服的回调
          */
-        Net.instance.addHandler("login_result", function (data: {
-            errcode: any,
-            errmsg: any,
-            data: {
-                roomid: any,
-                conf: any,
-                numofgames: any,
-                seats: any
-            }
-        }) {
-            logInfoFromServer("login_result", JSON.stringify(data));
+        Net.instance.addHandler("login_result", function (data) {
+            logInfoFromServer("login_result", JSON.stringify(data), cc.director.getScene().name);
             if (data.errcode === 0) {
                 var dataInside = data.data;
-                majiangData.roomId = dataInside.roomid;
-                majiangData.conf = dataInside.conf;
-                majiangData.maxNumOfGames = dataInside.conf.maxGames;
-                majiangData.numOfGames = dataInside.numofgames;
-                majiangData.seats = dataInside.seats;
-                majiangData.seatIndex = majiangData.getSeatIndexByID(userData.userId);
-                majiangData.isOver = false;
+                if (data.serverType == 'mj') { // 此时还没有进入游戏场景，所以需要服务器，告诉客户端我们是在哪个游戏登录了
+                    logInfoForCatchEye("我们在 mj 处理 login_result")
+                    majiangData.roomId = dataInside.roomid;
+                    majiangData.conf = dataInside.conf;
+                    majiangData.maxNumOfGames = dataInside.conf.maxGames;
+                    majiangData.numOfGames = dataInside.numofgames;
+                    majiangData.seats = dataInside.seats;
+                    majiangData.seatIndex = majiangData.getSeatIndexByID(userData.userId);
+                    majiangData.isOver = false;
+                } else if (data.serverType == 'littlGame') {
+                    logInfoForCatchEye("我们在 littlGame 处理 login_result")
+                    runningGameData.roomId = dataInside.roomid;
+                    runningGameData.conf = dataInside.conf;
+                    runningGameData.maxNumOfGames = dataInside.conf.maxGames;
+                    runningGameData.numOfGames = dataInside.numofgames;
+                    runningGameData.seats = dataInside.seats;
+                    runningGameData.seatIndex = majiangData.getSeatIndexByID(userData.userId);
+                    runningGameData.isOver = false;
+                }
+
             } else {
                 console.log(data.errmsg);
             }
@@ -47,8 +51,13 @@ export default class GlobalNetListener extends cc.Component {
          * 注册登录麻将服完成的回调
          */
         Net.instance.addHandler("login_finished", function (data) {
-            logInfoFromServer("login_finished", data);
-            cc.director.loadScene("mjgame");
+            logInfoFromServer("login_finished", JSON.stringify(data));
+            if (data.gameType == 'mj') {
+                cc.director.loadScene("mjgame");
+            }
+            if (data.gameType == 'littlGame') {
+                cc.director.loadScene("runninggame");
+            }
         });
 
         Net.instance.addHandler("game_sync_push", function (data) {
@@ -127,14 +136,27 @@ export default class GlobalNetListener extends cc.Component {
             ready: any,
             seatindex: any
         }) => {
-            logInfoFromServer("new_user_comes_push == ", JSON.stringify(data));
-            var seatIndex = data.seatindex;
-            if (majiangData.seats[seatIndex].userid > 0) {
-                majiangData.seats[seatIndex].online = true;
-            } else {
-                data.online = true;
-                majiangData.seats[seatIndex] = data;
+            logInfoFromServer("new_user_comes_push == ", JSON.stringify(data), cc.director.getScene().name);
+
+            if (cc.director.getScene().name == 'runninggame') { // 此时已经进入游戏场景，不再需要服务器告诉是在哪个游戏中了
+                var seatIndex = data.seatindex;
+                if (runningGameData.seats[seatIndex].userid > 0) {
+                    runningGameData.seats[seatIndex].online = true;
+                } else {
+                    data.online = true;
+                    runningGameData.seats[seatIndex] = data;
+                }
             }
+            if (cc.director.getScene().name == 'mjgame') {
+                var seatIndex = data.seatindex;
+                if (majiangData.seats[seatIndex].userid > 0) {
+                    majiangData.seats[seatIndex].online = true;
+                } else {
+                    data.online = true;
+                    majiangData.seats[seatIndex] = data;
+                }
+            }
+
             EventCenter.instance.goDispatchEvent(EventType.updateMJTable);
         });
         /**
@@ -163,11 +185,10 @@ export default class GlobalNetListener extends cc.Component {
         Net.instance.addHandler("exit_result", function (data) {
             logInfoFromServer("exit_result == ", JSON.stringify(data));
 
-            majiangData.roomId = null;
-            majiangData.turn = -1;
-            majiangData.dingque = -1;
-            majiangData.isDingQueing = false;
-            majiangData.seats = [];
+            majiangData.reset();
+            runningGameData.reset();
+
+            cc.director.loadScene("hall");
         });
         /**
          * 有其他玩家离开房间

@@ -20,7 +20,7 @@ export class UserData {
     gems: number = 0;
     ip: string = "";
     sex: number = 0;
-    roomData: any = null;
+    roomData: any = null; // room id
 
     oldRoomId: any = null;
 
@@ -52,22 +52,6 @@ export class UserData {
                 this.login();
             }
         });
-    }
-    /**
-     * 注册玩家登录--使用的是注册时存在本地的账号
-     * @param ret 
-     */
-    onAuth(ret) {
-        var self = this;
-        if (ret.errcode !== 0) {
-            console.log(ret.errmsg);
-        }
-        else {
-            self.account = ret.account;
-            self.sign = ret.sign;
-            Http.instance.URL = "http://" + this.SI.hall;
-            self.login();
-        }
     }
     /**
      * 在账号信息设置完毕之后，进行登录请求
@@ -130,7 +114,7 @@ export class UserData {
      * @param roomId 房间id
      * @param callback 加入房间结果回调
      */
-    async enterRoom(roomId, callback?) {
+    async enterRoom(roomId, gameType, callback?) {
         var self = this;
         var onEnter = function (ret) {
             if (ret.errcode !== 0) {
@@ -158,6 +142,7 @@ export class UserData {
         var data = {
             account: this.account,
             sign: this.sign,
+            gameType: gameType,
             roomid: roomId
         };
         PopUI.instance.showWait("正在进入房间 " + roomId);
@@ -168,7 +153,6 @@ export class UserData {
 
 export class MajiangData {
     dissoveData: any = null;
-    dataEventHandler: any = null;
     roomId: any = null;
     conf: any = null; // 描述了这个房间的信息，比如 玩法，玩法设置等
     maxNumOfGames: number = 0;
@@ -298,7 +282,6 @@ export class MajiangData {
         Net.instance.ip = data.ip + ":" + data.port;
         debugInfo.instance.addInfo("麻将服ip = ", Net.instance.ip);
 
-        var self = this;
         var onConnectOK = function () {
             console.log("onConnectOK");
             var sd = {
@@ -318,9 +301,79 @@ export class MajiangData {
         Net.instance.connect(onConnectOK, onConnectFailed);
     }
 }
+export class RunningGameData {
+    dissoveData: any = null;
+    roomId: any = null;
+    gamestate: string = "";
+    conf: any = null; // 描述了这个房间的信息，比如 玩法，玩法设置等
+    maxNumOfGames: number = 0;
+    numOfGames: number = 0;
+    isOver: boolean = false;
+    seatIndex: number = 0; // 服务器分配给我的座位号
+    seats: Array<any> = []; // 服务器中的座位信息
+    /**
+     * 重置数据
+     */
+    reset() {
+        this.dissoveData = null;
+        this.roomId = null;
+        this.gamestate = '';
+        this.conf = null;
+        this.maxNumOfGames = 0;
+        this.numOfGames = 0;
+        this.isOver = false;
+        this.seatIndex = 0;
+        this.seats = [];
+    };
+    /**
+     * 
+     * @param data 连接新游服的数据，数据是在创建房间或者进入房间时，由服务器返回。
+     */
+    async connectGameServer(data) {
+        this.dissoveData = null;
+        Net.instance.ip = data.ip + ":" + data.port;
+        debugInfo.instance.addInfo("麻将服ip = ", Net.instance.ip);
+
+        var onConnectOK = function () {
+            console.log("onConnectOK");
+            var sd = {
+                token: data.token,
+                roomid: data.roomid,
+                time: data.time,
+                sign: data.sign,
+            };
+            Net.instance.send("login", sd);
+        };
+
+        var onConnectFailed = function () {
+            console.log("failed.");;
+        };
+        PopUI.instance.showWait("正在进入房间");
+        await waitForTime(0.3); // 停一下，太快看不清楚
+        Net.instance.connect(onConnectOK, onConnectFailed);
+    }
+    /**
+     * 游戏是否开始
+     */
+    isGameStart() {
+        if (this.gamestate == "") {
+            return false;
+        }
+        return true;
+    }
+    /**
+ * 是不是我自己
+ * @param testUserID 测试的玩家id
+ */
+    isMySelf(testUserID) {
+        if (testUserID == userData.userId) return true;
+        return false;
+    }
+}
 //原始数据
 export let userData: UserData = new UserData();
 export let majiangData: MajiangData = new MajiangData();
+export let runningGameData: RunningGameData = new RunningGameData();
 //数据模型绑定,定义后不能修改顺序
 VM.add(userData, 'userData');    //定义全局tag
 VM.add(majiangData, 'majiangData');

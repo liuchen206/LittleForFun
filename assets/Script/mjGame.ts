@@ -115,7 +115,6 @@ export default class mjGame extends cc.Component {
 
         this.addNetListener();
         this.updateTalbleSeat();
-        // majiangData.reset();
         this.updateFunctionBtns();
         this.chectGameStatus();
         debugInfo.instance.addInfo("是否游戏开始", majiangData.isGameStart() ? "true" : "false")
@@ -123,8 +122,9 @@ export default class mjGame extends cc.Component {
     }
 
     // update (dt) {}
+
     /**
-     * 检查游戏状态。确定是否需要展示特定界面
+     * 检查游戏状态。确定是否需要展示特定界面.比如投票解散，定缺等
      */
     chectGameStatus() {
         if (majiangData.isDingQueing == true) {
@@ -155,6 +155,12 @@ export default class mjGame extends cc.Component {
         PopUI.instance.showDialog("离开房间", "确认退出房间？",
             quickCreateEventHandler(this.node, "mjGame", "doBackToHall"),
             quickCreateEventHandler(this.node, "mjGame", "doCancel"));
+    }
+    /**
+     * 做些取消逻辑，没有就算了
+     */
+    doCancel(){
+
     }
     /**
      * 根据游戏的进程，更新界面的功能按钮
@@ -190,8 +196,9 @@ export default class mjGame extends cc.Component {
      * 退出房间
      */
     private doBackToHall() {
+        console.log('发送 exit 消息');
+        
         Net.instance.send("exit");
-        // cc.director.loadScene("hall");
     }
     /**
      * 按全局保存的各个座位信息，更新ui界面

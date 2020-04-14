@@ -113,9 +113,9 @@ export default class joinGameInput extends cc.Component {
      */
     private inputDone() {
         console.log("inputDone");
-        userData.enterRoom(this.getInput(), (ret) => {
+        userData.enterRoom(this.getInput(), 'mj', (ret) => {
             if (ret.errcode == 0) {
-                this.node.destroy();
+                this.node.active = false;
             } else {
                 var content = "房间[" + this.getInput() + "]不存在，请重新输入!";
                 if (ret.errcode == 4) {

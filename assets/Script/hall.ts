@@ -1,6 +1,6 @@
 import { checkInit } from "./core_system/SomeRepeatThing";
 import PopUI from "./core_system/PopUI";
-import { majiangData, userData } from "./core_system/UserModel";
+import { majiangData, userData, runningGameData } from "./core_system/UserModel";
 import Http from "./core_system/Http";
 import Net from "./core_system/Net";
 import debugInfo from "./core_system/debugInfo";
@@ -11,9 +11,14 @@ const { ccclass, property } = cc._decorator;
 export default class hall extends cc.Component {
     @property({
         type: cc.Button,
-        tooltip: '快速开始按钮'
+        tooltip: '快速开始麻将按钮'
     })
     quickBtn: cc.Button = null;
+    @property({
+        type: cc.Button,
+        tooltip: '快速开始littlegame按钮'
+    })
+    quickLitterGameBtn: cc.Button = null;
     @property({
         type: cc.Button,
         tooltip: '返回房间按钮'
@@ -40,10 +45,12 @@ export default class hall extends cc.Component {
 
         if (userData.roomData == null) {
             this.quickBtn.interactable = true;
+            this.quickLitterGameBtn.interactable = true;
             this.backRoomBtn.interactable = false;
             this.joinRoomBtn.interactable = true;
         } else {
             this.quickBtn.interactable = false;
+            this.quickLitterGameBtn.interactable = false;
             this.backRoomBtn.interactable = true;
             this.joinRoomBtn.interactable = false;
         }
@@ -54,8 +61,7 @@ export default class hall extends cc.Component {
     initView() {
         this.showJoinRoomInput(false);
     }
-    onQuickStart() {
-        var self = this;
+    onQuickStartMJ() {
         var onCreate = function (ret) {
             if (ret.errcode !== 0) {
                 //console.log(ret.errmsg);
@@ -72,7 +78,8 @@ export default class hall extends cc.Component {
 
 
         var conf = {
-            type: 'xzdd',
+            type: 'xzdd', // 血战到底
+            serverType: "mj", // 大游戏类型-麻将
             difen: 0,
             zimo: 0,
             jiangdui: false,
@@ -92,8 +99,39 @@ export default class hall extends cc.Component {
         console.log(data);
         Http.instance.sendRequest("/create_private_room", data, onCreate);
     }
+    onQuickStartLittleGame() {
+        var onCreate = function (ret) {
+            if (ret.errcode !== 0) {
+                //console.log(ret.errmsg);
+                if (ret.errcode == 2222) {
+                    PopUI.instance.showDialog("抱歉", "房卡不足，创建房间失败!");
+                } else {
+                    PopUI.instance.showDialog("抱歉", "创建房间失败,错误码:" + ret.errcode);
+                }
+            }
+            else {
+                runningGameData.connectGameServer(ret);
+            }
+        };
+
+
+        var conf = {
+            type: 'little_first',
+            serverType: "littlGame",
+            playerNum: 2,
+            playRound: 1,
+        };
+
+        var data = {
+            account: userData.account,
+            sign: userData.sign,
+            conf: JSON.stringify(conf)
+        };
+        console.log(data);
+        Http.instance.sendRequest("/create_private_room", data, onCreate);
+    }
     onBackToRoom() {
-        userData.enterRoom(userData.roomData);
+        userData.enterRoom(userData.roomData, 'mj');
         userData.roomData = null;
     }
     onJoinRoom() {

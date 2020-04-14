@@ -86,7 +86,8 @@ export default class loading extends cc.Component {
                 debugInfo.instance.addInfo("新版本号为", ret.version, "旧版本号为", Http.instance.VERSION.toString());
                 if (ret.version != Http.instance.VERSION) {
                     //将要进行更新 todo
-                    debugInfo.instance.addInfo("将要进行更新 todo");
+                    debugInfo.instance.addInfo("将要进行更新 但是我们没有更新功能，依旧直接登录");
+                    self.startPreloading();
                 } else {
                     self.startPreloading();
                 }
