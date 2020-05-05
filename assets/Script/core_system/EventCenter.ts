@@ -24,6 +24,8 @@ export enum EventType {
     game_chupai_push = "game_chupai_push",
     game_chupai_notify_push = 'game_chupai_notify_push',
     game_mopai_push = 'game_mopai_push',
+
+    game_myPosition_push = 'game_myPosition_push',
 }
 
 /**

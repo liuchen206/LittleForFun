@@ -2,6 +2,9 @@ import majiang, { mjDir } from "./majiang";
 import { majiangData, userData } from "../core_system/UserModel";
 import EventCenter, { EventType } from "../core_system/EventCenter";
 import { convertDirToLocalIndex, logInfoForCatchEye } from "../core_system/SomeRepeatThing";
+import { waitForTime } from "../../tools/Tools";
+import CustomGrid from "../../tools/CustomGrid";
+import mjGame from "../mjGame";
 
 const { ccclass, property } = cc._decorator;
 
@@ -21,12 +24,15 @@ export default class foldsMJ extends cc.Component {
         tooltip: '此牌池中展示的牌的方向'
     })
     showMJDir: mjDir = mjDir.down;
+    @property({
+        tooltip: "麻将 尺寸",
+    })
+    mjSize: cc.Size = new cc.Size(30, 52);
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
 
     start() {
-        // this.addIndex(0);
         this.onGameFolds();
     }
 
@@ -38,12 +44,13 @@ export default class foldsMJ extends cc.Component {
      */
     addIndex(index) {
         console.log("foldsMJ addIndex", index, this.node.childrenCount);
-
         let newMJ = cc.instantiate(this.mjPrefab);
+        newMJ.width = this.mjSize.width;
+        newMJ.height = this.mjSize.height;
         let mjTS = newMJ.getComponent(majiang);
         mjTS.forbitSelect(true, false);
         mjTS.showMajiang(index, this.showMJDir, true, false);
-        this.node.addChild(newMJ);
+        this.node.getComponent(CustomGrid).push(newMJ);
     }
     /**
      * 更新自己的牌池
@@ -57,24 +64,23 @@ export default class foldsMJ extends cc.Component {
             let folds: number[] = seatData.folds;
             if (!folds) return; // 可能进入房间时，没有手牌
 
-            let alreandyShows = this.node.getComponentsInChildren(majiang);
+            let grid = this.node.getComponent(CustomGrid);
             for (let i = 0; i < folds.length; i++) {
                 let mj = folds[i];
-                if (alreandyShows.length > i) {
-                    alreandyShows[i].showMajiang(mj, this.showMJDir, true, false);
-                    alreandyShows[i].forbitSelect(true, false);
-                } else {
-                    let newMJ = cc.instantiate(this.mjPrefab);
-                    let mjTS = newMJ.getComponent(majiang);
-                    mjTS.forbitSelect(true, false);
+                if (this.node.childrenCount > i) {
+                    let mjNode = grid.getNodeByLogicIndex(i);
+                    let mjTS = mjNode.getComponent(majiang);
                     mjTS.showMajiang(mj, this.showMJDir, true, false);
-                    this.node.addChild(newMJ);
+                    mjTS.forbitSelect(true, false);
+                } else {
+                    this.addIndex(mj);
                 }
             }
-            let i = alreandyShows.length;
-            while (i > folds.length) {
-                i--;
-                alreandyShows[i].node.destroy()
+            let counter = this.node.childrenCount;
+            // 说明实际展示的节点比数据中的还要多,不需要那么多
+            for (let i = folds.length; i < counter; i++) {
+                cc.log('准备删除节点', i)
+                grid.shift();
             }
         } else {
             this.node.removeAllChildren();

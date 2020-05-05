@@ -311,19 +311,24 @@ export class RunningGameData {
     isOver: boolean = false;
     seatIndex: number = 0; // 服务器分配给我的座位号
     seats: Array<any> = []; // 服务器中的座位信息
+    turn: number = 0; //轮到谁操作了
     /**
      * 重置数据
      */
     reset() {
         this.dissoveData = null;
-        this.roomId = null;
         this.gamestate = '';
         this.conf = null;
         this.maxNumOfGames = 0;
         this.numOfGames = 0;
         this.isOver = false;
         this.seatIndex = 0;
-        this.seats = [];
+        this.seats = [{},{},{},{}];
+        this.turn = -1;
+
+        for (var i = 0; i < this.seats.length; ++i) {
+            this.seats[i].positonInMap = 0;
+        }
     };
     /**
      * 
@@ -362,12 +367,34 @@ export class RunningGameData {
         return true;
     }
     /**
- * 是不是我自己
- * @param testUserID 测试的玩家id
- */
+     * 是不是我自己
+     * @param testUserID 测试的玩家id
+     */
     isMySelf(testUserID) {
         if (testUserID == userData.userId) return true;
         return false;
+    }
+    /**
+     * 通过玩家的id返回自己的座位信息
+     * @param userId 玩家的id
+     */
+    getSeatByID(userId) {
+        var seatIndex = this.getSeatIndexByID(userId);
+        if (seatIndex == -1) return null;
+        return this.seats[seatIndex];
+    }
+    /**
+     * 通过玩家id返回自己的服务器座位号
+     * @param userId 玩家的id
+     */
+    getSeatIndexByID(userId) {
+        for (var i = 0; i < this.seats.length; ++i) {
+            var s = this.seats[i];
+            if (s.userid == userId) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
 //原始数据
@@ -377,6 +404,7 @@ export let runningGameData: RunningGameData = new RunningGameData();
 //数据模型绑定,定义后不能修改顺序
 VM.add(userData, 'userData');    //定义全局tag
 VM.add(majiangData, 'majiangData');
+VM.add(runningGameData, 'runningGameData');
 //使用注意事项
 //VM 得到的回调 onValueChanged ，不能强制修改赋值
 //VM 的回调 onValueChanged 中，不能直接操作VM数据结构,否则会触发 循环调用

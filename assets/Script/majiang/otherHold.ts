@@ -25,7 +25,11 @@ export default class otherHold extends cc.Component {
     // onLoad () {}
 
     start() {
-        this.onGameOtherHolds();
+        if (majiangData.gamestate == "playing") {
+            this.onGameOtherHolds();
+        } else {
+            this.node.removeAllChildren();
+        }
     }
 
     // update (dt) {}

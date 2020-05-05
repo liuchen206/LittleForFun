@@ -89,6 +89,8 @@ export default class hall extends cc.Component {
             dianganghua: 0,
             menqing: false,
             tiandihu: false,
+            playRound: 1, // 总共玩几盘
+            playerNum: 2,//玩家人数
         };
 
         var data = {
@@ -118,8 +120,8 @@ export default class hall extends cc.Component {
         var conf = {
             type: 'little_first',
             serverType: "littlGame",
-            playerNum: 2,
-            playRound: 1,
+            playerNum: 2,//玩家人数
+            playRound: 1, // 总共玩几盘
         };
 
         var data = {

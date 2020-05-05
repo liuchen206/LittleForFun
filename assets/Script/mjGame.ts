@@ -279,7 +279,7 @@ export default class mjGame extends cc.Component {
     private game_mopai_push(data) {
         console.log('game_mopai_push', JSON.stringify(data));
         this.chectGameStatus();
-        this.myHoldMJ_TS.addIndex(data);
+        this.myHoldMJ_TS.mopai(data);
     }
     /**
      * 注册麻将房的网络消息

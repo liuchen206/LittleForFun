@@ -2,6 +2,7 @@ import Net from "../core_system/Net";
 import { majiangData } from "../core_system/UserModel";
 import toastText from "../ui_component/toastText";
 import ToastUI from "../core_system/ToastUI";
+import { logInfoForCatchEye } from "../core_system/SomeRepeatThing";
 
 const { ccclass, property } = cc._decorator;
 export enum mjDir {
@@ -93,6 +94,7 @@ export default class majiang extends cc.Component {
             this.doSelect(true);
         } else if (this.currentSelectType == mjStatus.select) {
             // 点击已经被选中的牌意味着打出 这张牌
+            logInfoForCatchEye('打出 麻将类型 ==' + this.mjId);
             Net.instance.send('chupai', this.mjId);
             this.node.dispatchEvent(new cc.Event.EventCustom("selectReset", true));
             this.node.dispatchEvent(new cc.Event.EventCustom("reorder", true));

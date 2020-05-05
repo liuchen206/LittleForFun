@@ -1,10 +1,9 @@
 import Net from "../core_system/Net";
-import { majiangData, userData } from "../core_system/UserModel";
+import { majiangData, userData, runningGameData } from "../core_system/UserModel";
 import { stringify } from "../../tools/socket-io";
 import { PrefixInteger } from "../../tools/Tools";
 
 const { ccclass, property } = cc._decorator;
-
 @ccclass
 export default class DissolveUI extends cc.Component {
     @property({
@@ -46,6 +45,7 @@ export default class DissolveUI extends cc.Component {
 
     // LIFE-CYCLE CALLBACKS:
     timeToAutoDissolve: number = 999;
+
     // onLoad () {}
 
     start() {
@@ -63,18 +63,19 @@ export default class DissolveUI extends cc.Component {
         this.timeCounter.string = PrefixInteger(time, 2) + "秒之后自动解散";
     }
     updateDissolve() {
+        let data = this.getGameDataInstance();
         this.unschedule(this.onClock);
-        this.timeToAutoDissolve = Math.floor(majiangData.dissoveData.time);
+        this.timeToAutoDissolve = Math.floor(data.dissoveData.time);
         this.setCounterLabel(this.timeToAutoDissolve);
         this.schedule(this.onClock, 1, this.timeToAutoDissolve);
 
-        for (var i = 0; i < majiangData.dissoveData.states.length; ++i) {
-            var b = majiangData.dissoveData.states[i];
-            var name = majiangData.seats[i].name;
+        for (var i = 0; i < data.dissoveData.states.length; ++i) {
+            var b = data.dissoveData.states[i];
+            var name = data.seats[i].name;
             let text = "";
             if (b) {
                 text = "[已同意] " + name;
-                if (i == majiangData.getSeatIndexByID(userData.userId)) this.showBtns(false); // 我已经投了 '同意' 票
+                if (i == data.getSeatIndexByID(userData.userId)) this.showBtns(false); // 我已经投了 '同意' 票
             }
             else {
                 text = "[待确认] " + name;
@@ -88,6 +89,14 @@ export default class DissolveUI extends cc.Component {
     showBtns(isShow: boolean) {
         this.okNode.active = isShow;
         this.noNode.active = isShow;
+    }
+    getGameDataInstance() {
+        if (cc.director.getScene().name == 'runninggame') {
+            return runningGameData;
+        }
+        if (cc.director.getScene().name == 'mjgame') {
+            return majiangData;
+        }
     }
     /**
      * 同意了 在游戏进行中时解散房间
