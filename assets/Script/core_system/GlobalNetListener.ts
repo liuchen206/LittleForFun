@@ -137,7 +137,7 @@ export default class GlobalNetListener extends cc.Component {
                         majiangData.dingque = sd.que;
                     }
                 }
-                EventCenter.instance.goDispatchEvent(EventType.game_holds);
+                EventCenter.instance.goDispatchEvent(EventType.game_holds_push);
             }
 
         });
@@ -286,7 +286,7 @@ export default class GlobalNetListener extends cc.Component {
                 majiangData.dissoveData = data;
             }
 
-            EventCenter.instance.goDispatchEvent(EventType.onDissolveNotice);
+            EventCenter.instance.goDispatchEvent(EventType.dissolve_notice_push);
         });
         /**
          * 注册 服务器判定此次房间解散失败回调
@@ -301,12 +301,12 @@ export default class GlobalNetListener extends cc.Component {
                 majiangData.dissoveData = null;
             }
 
-            EventCenter.instance.goDispatchEvent(EventType.onDissolveFailed);
+            EventCenter.instance.goDispatchEvent(EventType.dissolve_cancel_push);
         });
         Net.instance.addHandler("game_over_push", function (data) {
             logInfoFromServer("game_over_push == ", JSON.stringify(data));
 
-            EventCenter.instance.goDispatchEvent(EventType.onGameOver);
+            EventCenter.instance.goDispatchEvent(EventType.game_over_push, data);
         });
         /**
          * --------------------------------- 所有游戏通用消息 end anchor------------------------------------------
@@ -364,12 +364,18 @@ export default class GlobalNetListener extends cc.Component {
                 s.ready = false;
             }
 
-            EventCenter.instance.goDispatchEvent(EventType.game_holds);
+            EventCenter.instance.goDispatchEvent(EventType.game_holds_push);
         });
+        /**
+         * 注册 对局局数通知
+         */
         Net.instance.addHandler("game_num_push", function (data) {
             logInfoFromServer("game_num_push == ", JSON.stringify(data));
             majiangData.numOfGames = data;
         });
+        /**
+         * 注册 麻将剩余数量通知
+         */
         Net.instance.addHandler("mj_count_push", function (data) {
             logInfoFromServer("mj_count_push == ", JSON.stringify(data));
 
@@ -437,6 +443,64 @@ export default class GlobalNetListener extends cc.Component {
 
             EventCenter.instance.goDispatchEvent(EventType.game_mopai_push, data);
         });
+        /**
+         * 注册 能够进行的操作通知
+         */
+        Net.instance.addHandler("game_action_push", function (data) {
+            logInfoFromServer("game_action_push == ", JSON.stringify(data));
+
+            majiangData.curaction = data;
+            console.log(data);
+            EventCenter.instance.goDispatchEvent(EventType.game_action, data);
+        });
+        /**
+         * 注册 有玩家过了
+         */
+        Net.instance.addHandler("guo_notify_push", function (data) {
+            logInfoFromServer("guo_notify_push == ", JSON.stringify(data));
+
+            EventCenter.instance.goDispatchEvent(EventType.guo_notify_push, data);
+
+        });
+        /**
+         * 注册 过消息的返回，一般用于关闭选择操作界面
+         */
+        Net.instance.addHandler("guo_result", function (data) {
+            logInfoFromServer("guo_result == ", JSON.stringify(data));
+
+            EventCenter.instance.goDispatchEvent(EventType.guo_result, data);
+        });
+        /**
+         * 注册 碰牌操作返回
+         */
+        Net.instance.addHandler("peng_notify_push", function (data) {
+            logInfoFromServer("peng_notify_push == ", JSON.stringify(data));
+            EventCenter.instance.goDispatchEvent(EventType.peng_notify_push, data);
+        });
+        /**
+         * 注册 杠牌操作返回
+         */
+        Net.instance.addHandler("gang_notify_push", function (data) {
+            logInfoFromServer("gang_notify_push == ", JSON.stringify(data));
+            EventCenter.instance.goDispatchEvent(EventType.gang_notify_push, data);
+        });
+        /**
+         * 注册 这个消息跟杠有关暂时不知道用作什么逻辑
+         */
+        Net.instance.addHandler("hangang_notify_push", function (data) {
+            logInfoFromServer("hangang_notify_push == ", JSON.stringify(data));
+            EventCenter.instance.goDispatchEvent(EventType.hangang_notify_push, data);
+        });
+        /**
+         * 注册 玩家胡牌通知
+         */
+        Net.instance.addHandler("hu_push", function (data) {
+            logInfoFromServer("hu_push == ", JSON.stringify(data));
+            EventCenter.instance.goDispatchEvent(EventType.hu_push, data);
+        });
+        /**
+         * 注册 所有对局结束通知
+         */
         /**
          * --------------------------------- 麻将游戏独有 end anchor ------------------------------------------
          */

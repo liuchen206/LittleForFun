@@ -11,10 +11,10 @@ export enum EventType {
     WaitEnd = "WaitEnd",
     SomePopUIClosed = "SomePopUIClosed",
     updateMJTable = "updateMJTable",
-    onDissolveNotice = "onDissolveNotice",
-    onDissolveFailed = "onDissolveFailed",
-    onGameOver = "onGameOver",
-    game_holds = "game_holds",
+    dissolve_notice_push = "dissolve_notice_push",
+    dissolve_cancel_push = "dissolve_cancel_push",
+    game_over_push = "game_over_push",
+    game_holds_push = "game_holds_push",
 
     game_dingque_push = "game_dingque_push",
     game_dingque_finish_push = "game_dingque_finish_push",
@@ -24,6 +24,13 @@ export enum EventType {
     game_chupai_push = "game_chupai_push",
     game_chupai_notify_push = 'game_chupai_notify_push',
     game_mopai_push = 'game_mopai_push',
+    game_action = 'game_action',
+    guo_notify_push = 'guo_notify_push',
+    guo_result = 'guo_result',
+    peng_notify_push = 'peng_notify_push',
+    gang_notify_push = 'gang_notify_push',
+    hangang_notify_push = 'hangang_notify_push',
+    hu_push = 'hu_push',
 
     game_myPosition_push = 'game_myPosition_push',
 }
@@ -75,7 +82,7 @@ export default class EventCenter extends cc.Component {
         if (data == null) {
             data = 'None';
         }
-        logInfoFromCoreSys("派发事件", eventname, data);
+        logInfoFromCoreSys("派发事件", eventname, JSON.stringify(data));
         this.eventCenter.emit(eventname, data);
     }
 }

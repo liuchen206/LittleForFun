@@ -58,6 +58,9 @@ export default class DingQueUI extends cc.Component {
     }
 
     // update (dt) {}
+    onDisable() {
+        this.reset();
+    }
     /**
      * 注册麻将房的网络消息
      */
@@ -67,6 +70,15 @@ export default class DingQueUI extends cc.Component {
     onDestroy() {
         EventCenter.instance.RemoveListener(EventType.game_dingque_notify_push, this);
     }
+    private reset() {
+        this.tongBtn.interactable = true;
+        this.tiaoBtn.interactable = true;
+        this.wanBtn.interactable = true;
+        this.rLabel.string = "正在定缺";
+        this.upLabel.string = "正在定缺";
+        this.lLabel.string = "正在定缺";
+        this.myLabel.string = "正在定缺";
+    }
     onSomeOneDingqueDone(data) {
         console.log("data 代表完成定缺的玩家的id", data);
         let seatIndex = majiangData.getSeatIndexByID(data);
@@ -75,16 +87,16 @@ export default class DingQueUI extends cc.Component {
         console.log("localSeatIndex 是转换后的本地座位号。自己为0号，按逆时针一次加一.", localSeatIndex);
 
         // 判断方位时 以转换后的本地座位号为主。 自己为0号座位。按逆时针分别为1，2，3号玩家座位
-        if(localSeatIndex == 0){
+        if (localSeatIndex == 0) {
             // 我自己，由按下按钮时的逻辑处理
         }
-        if(localSeatIndex == 1){
+        if (localSeatIndex == 1) {
             this.rLabel.string = "定缺完成";
         }
-        if(localSeatIndex == 2){
+        if (localSeatIndex == 2) {
             this.upLabel.string = "定缺完成";
         }
-        if(localSeatIndex == 3){
+        if (localSeatIndex == 3) {
             this.lLabel.string = "定缺完成";
         }
     }

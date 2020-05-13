@@ -1,8 +1,8 @@
 import EventCenter, { EventType } from "../core_system/EventCenter";
-import { majiangData, userData } from "../core_system/UserModel";
+import { majiangData, userData, runningGameData } from "../core_system/UserModel";
 import majiang, { mjDir } from "./majiang";
 import mjGame from "../mjGame";
-import { logInfoForCatchEye } from "../core_system/SomeRepeatThing";
+import { logInfoForCatchEye, convertDirToLocalIndex } from "../core_system/SomeRepeatThing";
 import { waitForTime } from "../../tools/Tools";
 import arrow from "./arrow";
 import CustomGrid from "../../tools/CustomGrid";
@@ -38,7 +38,9 @@ export default class holdsMJ extends cc.Component {
      * 注册麻将房的网络消息
      */
     addNetListener() {
-        EventCenter.instance.AddListener(EventType.game_holds, this.onGameHolds, this);
+        EventCenter.instance.AddListener(EventType.gang_notify_push, this.gang_notify_push, this);
+        EventCenter.instance.AddListener(EventType.peng_notify_push, this.peng_notify_push, this);
+        EventCenter.instance.AddListener(EventType.game_holds_push, this.onGameHolds, this);
         this.node.on("selectReset", () => {
             console.log("selectReset");
             let mjTSList = this.node.getComponentsInChildren(majiang);
@@ -53,15 +55,51 @@ export default class holdsMJ extends cc.Component {
         })
     }
     onDestroy() {
-        EventCenter.instance.RemoveListener(EventType.game_holds, this);
+        EventCenter.instance.RemoveListener(EventType.gang_notify_push, this);
+        EventCenter.instance.RemoveListener(EventType.peng_notify_push, this);
+        EventCenter.instance.RemoveListener(EventType.game_holds_push, this);
     }
-
+    private gang_notify_push(data) {
+        cc.log('自己杠牌后，删除手牌')
+        let userid = data.userid;
+        let pai = data.pai;
+        // 是不是我这家碰的
+        if (userData.userId == userid) {
+            if (data.gangtype == 'angang') {
+                this.deleteIndex(pai);
+                this.deleteIndex(pai);
+                this.deleteIndex(pai);
+                this.deleteIndex(pai);
+                majiangData.getSeatByID(userid).angangs.push(pai);
+            }
+            if (data.gangtype == 'diangang') {
+                this.deleteIndex(pai);
+                this.deleteIndex(pai);
+                this.deleteIndex(pai);
+                majiangData.getSeatByID(userid).diangangs.push(pai);
+            }
+            if (data.gangtype == 'wangang') {
+                this.deleteIndex(pai);
+                majiangData.getSeatByID(userid).wangangs.push(pai);
+            }
+        }
+    }
+    private peng_notify_push(data) {
+        cc.log('自己碰牌后，删除手牌')
+        let userid = data.userid;
+        let pai = data.pai;
+        // 是不是我这家碰的
+        if (userData.userId == userid) {
+            majiangData.getSeatByID(userid).pengs.push(pai);
+            this.deleteIndex(pai);
+            this.deleteIndex(pai);
+        }
+    }
     /**
      * 按id删除一个麻将手牌
      * @param index 待删除的麻将id
      */
     deleteIndex(index) {
-
         let alreandyShows = this.node.getComponentsInChildren(majiang);
         let isBingo = false;
         // 在展示手牌中删除
@@ -94,19 +132,19 @@ export default class holdsMJ extends cc.Component {
      * 摸牌-加入一张牌到最左边，并且和牌堆离开一段距离，作为区别这是张摸起来的牌
      */
     mopai(index) {
-        this.addIndex(index, true);
+        this.addIndex(index, true, true);
     }
     /**
      * 向手牌中添加一张牌
      * @param index 服务器定义的麻将索引
      */
-    addIndex(index, needAddtoData?: boolean) {
+    addIndex(index, needAddtoData?: boolean, needCatchEys?: boolean) {
         let newMJ = cc.instantiate(this.mjPrefab);
         newMJ.width = this.mjSize.width;
         newMJ.height = this.mjSize.height;
         let mjTS = newMJ.getComponent(majiang);
         mjTS.showMajiang(index, mjDir.down, true, true);
-        this.node.getComponent(CustomGrid).push(newMJ);
+        this.node.getComponent(CustomGrid).push(newMJ, needCatchEys);
 
         if (needAddtoData) {
             var s = majiangData.getSeatByID(userData.userId);

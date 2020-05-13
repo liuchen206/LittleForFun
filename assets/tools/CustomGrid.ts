@@ -177,7 +177,7 @@ export default class CustomGrid extends cc.Component {
         }
     }
     // 在尾部添加一个节点
-    public push(node) {
+    public push(node, needCatchEye?: boolean) {
         let current = this.node.childrenCount;
         let max = this.col * this.row;
         if (current == max && max > 1) {
@@ -189,6 +189,14 @@ export default class CustomGrid extends cc.Component {
         this.node.addChild(node);
         this.reorderZIndex();
         this.reorderPosition();
+
+        // 这个把新加的节点和其他节点区分展示的功能。
+        if (needCatchEye == true) {
+            let pushedNode = this.getNodeByLogicIndex(this.node.childrenCount - 1);
+            let offset = this.getXYOffsetByLogic(this.node.childrenCount); // 算出比当前节点排的还后面的一个节点位置
+            pushedNode.x = offset.x * this.itemSize.width - (this.itemSize.width / 2) * (offset.x == 0 ? 0 : 1);
+            pushedNode.y = offset.y * this.itemSize.height - (this.itemSize.height / 2) * (offset.y == 0 ? 0 : 1);
+        }
     }
     // 在尾部删除一个节点
     public shift() {
@@ -209,13 +217,13 @@ export default class CustomGrid extends cc.Component {
         }
     }
     // 按节点实例删除一个节点
-    public async deleteByNode(item: cc.Node) {
+    public deleteByNode(item: cc.Node) {
         let logicIndex = this.findNodeLogicIndex(item);
         cc.log('将要转移到最后的是 index', logicIndex);
         if (logicIndex >= 0) {
             for (let i = logicIndex; i < this.node.childrenCount - 1; i++) {
-                await waitForTime(0.1);
-                cc.log('交换逻辑下标', i, i + 1)
+                // await waitForTime(0.1); // 测试时候让程序慢下来，方便观察
+                // cc.log('交换逻辑下标', i, i + 1)
                 this.exchangeLogicIndex(i, i + 1);
                 this.reorderZIndex();
                 this.reorderPosition();

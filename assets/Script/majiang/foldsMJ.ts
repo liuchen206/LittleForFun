@@ -60,7 +60,7 @@ export default class foldsMJ extends cc.Component {
         let seatData = majiangData.getSeatByLocalIndex(localIndex);
         logInfoForCatchEye("尝试获取牌池信息", localIndex + '___', JSON.stringify(seatData), '___' + mjDir[this.showMJDir]);
         if (seatData != null && seatData.folds) {
-            console.log("牌池更新", JSON.stringify(seatData.folds));
+            console.log("出牌牌池更新", JSON.stringify(seatData.folds));
             let folds: number[] = seatData.folds;
             if (!folds) return; // 可能进入房间时，没有手牌
 
@@ -79,7 +79,6 @@ export default class foldsMJ extends cc.Component {
             let counter = this.node.childrenCount;
             // 说明实际展示的节点比数据中的还要多,不需要那么多
             for (let i = folds.length; i < counter; i++) {
-                cc.log('准备删除节点', i)
                 grid.shift();
             }
         } else {

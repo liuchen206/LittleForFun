@@ -14,6 +14,9 @@ import holdsMJ from "./majiang/holdsMJ";
 import foldsMJ from "./majiang/foldsMJ";
 import { mjDir } from "./majiang/majiang";
 import otherHold from "./majiang/otherHold";
+import optUI from "./majiang/optUI";
+import oneGameResult from "./majiang/oneGameResult";
+import allGameResult from "./majiang/allGameResult";
 
 const { ccclass, property } = cc._decorator;
 
@@ -72,7 +75,11 @@ export default class mjGame extends cc.Component {
         tooltip: '我自己的出牌展示的控制脚本'
     })
     myFoldMJ_TS: foldsMJ = null;
-
+    @property({
+        type: optUI,
+        tooltip: '我自己的操作面板'
+    })
+    optTS: optUI = null;
     @property({
         type: foldsMJ,
         tooltip: '我自己左侧（上家）的出牌展示的控制脚本'
@@ -106,6 +113,11 @@ export default class mjGame extends cc.Component {
         tooltip: '我自己右侧（下家）的手牌展示的控制脚本'
     })
     rightHoldMJ_TS: otherHold = null;
+    @property({
+        type: oneGameResult,
+        tooltip: '单局胡牌结果面板控制脚本'
+    })
+    oneGameResultTS: oneGameResult = null;
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
@@ -159,7 +171,7 @@ export default class mjGame extends cc.Component {
     /**
      * 做些取消逻辑，没有就算了
      */
-    doCancel(){
+    doCancel() {
 
     }
     /**
@@ -197,7 +209,7 @@ export default class mjGame extends cc.Component {
      */
     private doBackToHall() {
         console.log('发送 exit 消息');
-        
+
         Net.instance.send("exit");
     }
     /**
@@ -223,13 +235,25 @@ export default class mjGame extends cc.Component {
     private dissolveFailed() {
         this.waitDissolve.active = false;
     }
-    private gameOver() {
-        PopUI.instance.showDialog("游戏结束", "退出房间",
-            quickCreateEventHandler(this.node, "mjGame", "doGameOver"), null, true, "知道了");
+    private gameOver(data) {
+        var results = data.results;
+        for (var i = 0; i < majiangData.seats.length; ++i) {
+            if (majiangData.seats[i].userId > 0) {
+                majiangData.seats[i].score = results.length == 0 ? 0 : results[i].totalscore;
+            } else {
+                majiangData.seats[i].score = 0;
+            }
+        }
+        this.showOneGameRestule(data); // 一局结束
     }
-    private doGameOver() {
-        cc.director.loadScene("hall");
+    /**
+     * 展示一局对局结束后的对局情况
+     * @param results 一局的游戏结果
+     */
+    private showOneGameRestule(data) {
+        this.oneGameResultTS.showResultData(data);
     }
+
     private game_dingque_push() {
         this.chectGameStatus();
     }
@@ -239,15 +263,19 @@ export default class mjGame extends cc.Component {
     private game_playing_push() {
         this.chectGameStatus();
         this.updateFunctionBtns();
+
+        this.rightHoldMJ_TS.onGameOtherHolds();
+        this.upHoldMJ_TS.onGameOtherHolds();
+        this.leftHoldMJ_TS.onGameOtherHolds()
     }
     private game_chupai_push() {
         // 给其他玩家添加手牌
         let localIndex = majiangData.getLocalIndex(majiangData.turn);
         let dir = convertLocalIndexToMJDir(localIndex);
-        //if (dir == 0) nothing here; 是我自己我自己,由专门的holdsMJ脚本控制自己的手牌展示.这里只管理其他玩家。因为其他玩家的牌都是背着的。与自己的手牌不同，所以同意管理
-        if (dir == mjDir.right) this.rightHoldMJ_TS.addIndex();
-        if (dir == mjDir.up) this.upHoldMJ_TS.addIndex();
-        if (dir == mjDir.left) this.leftHoldMJ_TS.addIndex();
+        //if (dir == 0) nothing here; 是我自己我自己,由专门的holdsMJ脚本控制自己的手牌展示.这里只管理其他玩家。因为其他玩家的牌都是背着的。与自己的手牌不同，所以统一管理
+        if (dir == mjDir.right) this.rightHoldMJ_TS.onGameOtherHolds();
+        if (dir == mjDir.up) this.upHoldMJ_TS.onGameOtherHolds();
+        if (dir == mjDir.left) this.leftHoldMJ_TS.onGameOtherHolds();
 
         this.chectGameStatus();
     }
@@ -281,33 +309,42 @@ export default class mjGame extends cc.Component {
         this.chectGameStatus();
         this.myHoldMJ_TS.mopai(data);
     }
+    private game_action(data) {
+        console.log('处理操作', JSON.stringify(data));
+        this.optTS.showOpt(data);
+    }
+    private hu_push(data) {
+        cc.log('简单处理玩家胡牌', JSON.stringify(data));
+    }
     /**
      * 注册麻将房的网络消息
      */
     addNetListener() {
         EventCenter.instance.AddListener(EventType.updateMJTable, this.updateTalbleSeat, this);
-        EventCenter.instance.AddListener(EventType.onDissolveNotice, this.dissolveNotice, this);
-        EventCenter.instance.AddListener(EventType.onDissolveFailed, this.dissolveFailed, this);
-        EventCenter.instance.AddListener(EventType.onGameOver, this.gameOver, this);
+        EventCenter.instance.AddListener(EventType.dissolve_notice_push, this.dissolveNotice, this);
+        EventCenter.instance.AddListener(EventType.dissolve_cancel_push, this.dissolveFailed, this);
+        EventCenter.instance.AddListener(EventType.game_over_push, this.gameOver, this);
         EventCenter.instance.AddListener(EventType.game_dingque_push, this.game_dingque_push, this);
         EventCenter.instance.AddListener(EventType.game_dingque_finish_push, this.game_dingque_finish_push, this);
         EventCenter.instance.AddListener(EventType.game_playing_push, this.game_playing_push, this);
         EventCenter.instance.AddListener(EventType.game_chupai_push, this.game_chupai_push, this);
         EventCenter.instance.AddListener(EventType.game_chupai_notify_push, this.game_chupai_notify_push, this);
         EventCenter.instance.AddListener(EventType.game_mopai_push, this.game_mopai_push, this);
-
-
+        EventCenter.instance.AddListener(EventType.game_action, this.game_action, this);
+        EventCenter.instance.AddListener(EventType.hu_push, this.hu_push, this);
     }
     onDestroy() {
         EventCenter.instance.RemoveListener(EventType.updateMJTable, this);
-        EventCenter.instance.RemoveListener(EventType.onDissolveNotice, this);
-        EventCenter.instance.RemoveListener(EventType.onDissolveFailed, this);
-        EventCenter.instance.RemoveListener(EventType.onGameOver, this);
+        EventCenter.instance.RemoveListener(EventType.dissolve_notice_push, this);
+        EventCenter.instance.RemoveListener(EventType.dissolve_cancel_push, this);
+        EventCenter.instance.RemoveListener(EventType.game_over_push, this);
         EventCenter.instance.RemoveListener(EventType.game_dingque_push, this);
         EventCenter.instance.RemoveListener(EventType.game_dingque_finish_push, this);
         EventCenter.instance.RemoveListener(EventType.game_playing_push, this);
         EventCenter.instance.RemoveListener(EventType.game_chupai_push, this);
         EventCenter.instance.RemoveListener(EventType.game_chupai_notify_push, this);
         EventCenter.instance.RemoveListener(EventType.game_mopai_push, this);
+        EventCenter.instance.RemoveListener(EventType.game_action, this);
+        EventCenter.instance.RemoveListener(EventType.hu_push, this);
     }
 }

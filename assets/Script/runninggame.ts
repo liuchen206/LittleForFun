@@ -169,16 +169,16 @@ export default class runninggame extends cc.Component {
      */
     addNetListener() {
         EventCenter.instance.AddListener(EventType.updateMJTable, this.updateTalbleSeat, this);
-        EventCenter.instance.AddListener(EventType.onDissolveNotice, this.dissolveNotice, this);
-        EventCenter.instance.AddListener(EventType.onDissolveFailed, this.dissolveFailed, this);
-        EventCenter.instance.AddListener(EventType.onGameOver, this.gameOver, this);
+        EventCenter.instance.AddListener(EventType.dissolve_notice_push, this.dissolveNotice, this);
+        EventCenter.instance.AddListener(EventType.dissolve_cancel_push, this.dissolveFailed, this);
+        EventCenter.instance.AddListener(EventType.game_over_push, this.gameOver, this);
         EventCenter.instance.AddListener(EventType.game_playing_push, this.game_playing_push, this);
     }
     onDestroy() {
         EventCenter.instance.RemoveListener(EventType.updateMJTable, this);
-        EventCenter.instance.RemoveListener(EventType.onDissolveNotice, this);
-        EventCenter.instance.RemoveListener(EventType.onDissolveFailed, this);
-        EventCenter.instance.RemoveListener(EventType.onGameOver, this);
+        EventCenter.instance.RemoveListener(EventType.dissolve_notice_push, this);
+        EventCenter.instance.RemoveListener(EventType.dissolve_cancel_push, this);
+        EventCenter.instance.RemoveListener(EventType.game_over_push, this);
         EventCenter.instance.RemoveListener(EventType.game_playing_push, this);
     }
 }

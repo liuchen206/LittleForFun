@@ -183,6 +183,7 @@ export class MajiangData {
         this.isDingQueing = false;
         this.isHuanSanZhang = false;
         this.curaction = null;
+        this.huanpaimethod = -1;
         for (var i = 0; i < this.seats.length; ++i) {
             this.seats[i].holds = [];
             this.seats[i].folds = [];
@@ -194,7 +195,7 @@ export class MajiangData {
             this.seats[i].ready = false;
             this.seats[i].hued = false;
             this.seats[i].huanpais = null;
-            this.huanpaimethod = -1;
+            this.seats[i].score = 0;
         }
     }
     /**
@@ -210,8 +211,8 @@ export class MajiangData {
      * 因为在客户端界面自己总是显示在下方的座位上，无论服务器给自己分配的座位号是多少，只保证上下家关系一致即可
      * @param index 服务器座位号
      */
-    getLocalIndex(index) {
-        var ret = (index - this.seatIndex + 4) % 4;
+    getLocalIndex(serverIndex) {
+        var ret = (serverIndex - this.seatIndex + 4) % 4;
         return ret;
     }
     /**
@@ -235,7 +236,7 @@ export class MajiangData {
         return null;
     }
     /**
-     * 通过玩家的id返回自己的座位信息
+     * 通过玩家的id返回座位信息
      * @param userId 玩家的id
      */
     getSeatByID(userId) {
@@ -244,7 +245,7 @@ export class MajiangData {
         return this.seats[seatIndex];
     }
     /**
-     * 通过玩家id返回自己的服务器座位号
+     * 通过玩家id返回服务器座位号
      * @param userId 玩家的id
      */
     getSeatIndexByID(userId) {
@@ -323,7 +324,7 @@ export class RunningGameData {
         this.numOfGames = 0;
         this.isOver = false;
         this.seatIndex = 0;
-        this.seats = [{},{},{},{}];
+        this.seats = [{}, {}, {}, {}];
         this.turn = -1;
 
         for (var i = 0; i < this.seats.length; ++i) {
